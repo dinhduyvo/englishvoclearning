@@ -1,11 +1,31 @@
-<mat-card>
-    <mat-card-title>Actions Buttons</mat-card-title>
-    <mat-card-subtitle>End</mat-card-subtitle>
-    <mat-card-actions align="end">
-        <button mat-button>Like</button>
-        <button mat-button>SHARE</button>
-    </mat-card-actions>
+<mat-card flex style="height: -webkit-calc(100% - 176px)">
+  <mat-card-header>
+    <mat-icon mat-card-avatar>home</mat-icon>
+    <mat-card-title>Vocabulary Learning</mat-card-title>
+    <mat-card-subtitle>What you can choose to choice</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content flex layout-fill style="height: 100%">
+    <ng-container>
+      <mat-carousel
+        [autoplay]="true"
+        flex
+        layout-fill
+        slideHeight="-webkit-calc(100% - 76px)"
+        [maintainAspectRatio]="false"
+        color="primary"
+      >
+        <mat-carousel-slide *ngFor="let item of outputData">
+          <p *ngFor="let smallItem of item">
+            {{ smallItem }}
+          </p>
+
+        </mat-carousel-slide>
+      </mat-carousel>
+    </ng-container>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button>Previous</button>
+    <button mat-button>Pause</button>
+    <button mat-button>Next</button>
+  </mat-card-actions>
 </mat-card>
-<div *ngFor="let item of outputData">
-    <p> {{ item }}</p>
-</div>

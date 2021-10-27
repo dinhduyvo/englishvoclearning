@@ -16,7 +16,8 @@ export class HomeComponent implements OnInit {
     this.appService.getInfo().subscribe(data => {
       const list = data.split("\n");
       list.forEach(e => {
-        this.outputData.push(e);
+        var itemData = e.split(",");
+        this.outputData.push(itemData);
       })
     });
   }
