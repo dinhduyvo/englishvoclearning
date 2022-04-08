@@ -1,0 +1,544 @@
+accumulate (v),tích luỹ- chất đống,,false
+accurate (adj),chính xác,,false
+achieve (v),đạt được- giành được- hoàn thành,,true
+acknowledged (v),công nhận- ghi nhận or tỏ ra biết ơn,,false
+acquire (v),giành được- thu được- kiếm được,,true
+adapt (V- N-ation),thay đổi để phù hợp- thích nghi,,false
+adequate (adj),đầy đủ - enough,,false
+adjacent (adj),gần kề- kế liền- gắn kết,,false
+adjust (v),sửa lại cho phù hợp- sửa lại cho đúng,,false
+administrate (v),quản lí- quản trị,,false
+adults,người lớn- người trưởng thành,,false
+advocate (n),người biện hộ- người bênh vực- người ủng hộ,,true
+affect (v),ảnh hưởng- tác động,,false
+aggregate (adj- n- adv),gộp chung- tính toàn thể- tập hợp,,false
+aid (n),sự giúp đỡ- sự hỗ trợ,,false
+albeit (kết hợp),mặc dù-,,true
+allocate (v),phân bố- phân chia- phân phát,,false
+alter (v),thay đổi- sửa đổi- biến đổi,,false
+alternative (adj- n),thay phiên nhau- hoặc cái này hoặc cái kia- lựa chọn,,false
+ambiguous (adj),không rõ nghĩa- mơ hồ- không xác định,,false
+amend (v),sửa cho tốt hơn- cải thiện- cải tạo- bình phục- phục hồi,,false
+analogy (n),sự tương tự- tương đồng- giống nhau,,false
+analyze (v),phân tích- điều tra,,true
+annual (adj),hàng năm- sảy ra mỗi năm,,false
+anticipate (v),thấy trước- biết trước- lường trước,,false
+apparent (adj),rõ ràng- hiển nhiên- thấy rõ ra ngoài,,false
+append (v),nối vào- bổ sung- thêm vào,,false
+appreciate (v),đánh giá cao- thấy rõ- hiểu rõ giá trị,,false
+approach (v-n),tiếp cận- sự tiếp cận,,false
+appropriate (v),thích hợp- phù hợp,,false
+approximate (v),xấp xỉ- gần bằng,,false
+arbitrary (adj),tuỳ ý- tự ý - độc đoán,,false
+area (n),khu vực- lĩnh vực- phạm vi- diện tích,,false
+aspect (n),mặt khác- khía cạnh,,false
+assemble (v-n),tập hợp- thu thập cuộc họp,,false
+assess (v),định giá- đánh giá- định mức,,false
+assign (n.v),chỉ định- chuyển nuọng- phân phát,,false
+assist (v),giúp đỡ- hỗ trợ-,,false
+assume (v),cho rằng- giả sử giả thiết,,false
+assure (v),làm cho tin- đảm bảo- cam đoan,,false
+attach (v),coi- cho là- gán cho,,false
+attain (v),đến tới- đạt được,,false
+attitude (n),thái độ- quan điểm- điệu bộ,,false
+attribute (n- v),thuộc tính- vật tượng chưng- quy cho- cho là do...,,false
+author (n),nhà văn,,false
+authority (n),chuyên gia- người lão luyện,,false
+automate (v),tự động hoán,,false
+available (adj),có thể dùng được- có giá trị- có hiệu lực,,false
+aware (adj),biết- nhận thức thấy- nhận thấy,,false
+behalf (n),thay mặt cho nhân danh,,false
+benefit (n-v),lợi ích- quyền lợi- giúp ích- được lợi,,false
+bias (n-v),thành kiến- có khuynh hướng- sai lệch,,false
+bond (n),cam kết- mối liên hệ- lời cam kết- mối liên hệ,,false
+brief (adj- n-v),bản tóm tắt- ngắn - gọn,,false
+bulk (n-v),trọng tải- hàng hoá- số lượng lớn- xếp thành đống,,false
+capable,having the ability or qualities to do something,,false
+capacity,the maximum that can be contained or produced,,false
+categories,the groups by which something is classified,,false
+ceases,stops something or comes to an end,,false
+challenge,something needing effort in order to be done well,,false
+channel,a way through which something moves or is transmitted,,false
+chapter,a part of a book or period of time,,false
+chart,to watch carefully or record in detail,,false
+chemical,a substance with a distinct molecular composition,,false
+circumstances,the conditions which make a situation the way it is,,false
+cited,quoted as an example to support an argument,,false
+civil,relating to the ordinary people of a country,,false
+clarity,clearness of expression- thought- sound or image,,false
+classical,traditional- or belonging to ancient Rome or Greece,,false
+clause,a group of words with a meaning- or a legal document,,false
+code,regulations- or a set of symbols that mean something,,false
+coherence,logical consistency- or integration of parts,,false
+coincide,to happen at the same time- or be similar,,false
+collapse,fall down or fail suddenly,,false
+colleagues,people who work or study together at the same place,,false
+commenced,started,,false
+comments,spoken or written words to express an opinion,,false
+commission,a special group chosen to consider something,,false
+commitment,willingness to spend time or energy on something,,false
+commodity,something that can be bought or sold,,false
+communication,the way living things send messages to each other,,false
+community,a social group of people who live in a particular area,,false
+compensation,money received for the loss or damage of something,,false
+compiled,put together from various sources,,false
+complement,to make better when combined,,false
+complex,difficult to understand because of its many parts,,false
+components,all the individual parts of a system or thing,,false
+compounds,substances made up of two or more elements,,false
+comprehensive,including many things or everything that is necessary,,false
+comprise,to include or consist of,,false
+computer,a machine which performs calculations automatically,,false
+conceived,gave birth- imagined- or invented,,false
+concentration,the ability to think or focus carefully about one thing,,false
+concept,an abstract or general idea,,false
+conclusion,an opinion one reaches after careful consideration,,false
+concurrent,happening at the same time,,false
+conduct,to organize and perform a specific task,,false
+conference,a meeting or event with talks about a specific subject,,false
+confined,limited or enclosed,,false
+confirmed,proved true- or made certain,,false
+conflict,fighting- or disagreement between people or ideas,,false
+conformity,agreement in form or opinion- or doing as others do,,false
+consent,voluntary agreement or permission,,false
+consequences,the undesired results of a particular act or situation,,false
+considerable,large or of noticeable importance,,false
+consistent,in agreement with expectations or other facts,,false
+constant,unchanging- or happening frequently,,false
+constitutional,relating to the laws and principles of a government,,false
+constraints,conditions that limit the freedom of a system or thing,,false
+construction,the act of building something,,false
+consultation,a meeting to discuss something or seek advice,,false
+consumer,a person who buys goods or services,,false
+contact,communication- or when people or things touch,,false
+contemporary,existing now- or of the same period,,false
+context,the situation in which something exists or happens,,false
+contract,a legal agreement between people or groups,,false
+contradiction,disagreement or incompatibility of two or more things,,false
+contrary,not in agreement with- or opposite,,false
+contrast,an obvious difference between two or more things,,false
+contribution,money given or part played to achieve a group aim,,false
+controversy,disagreement or argument about an important topic,,false
+convention,a conference- or the accepted way of doing something,,false
+conversely,in the opposite way- on the other hand,,false
+converted,changed form- function or opinion,,false
+convinced,persuaded or lead someone to believe or do something,,false
+cooperative,willing to help- or involving joint activity,,false
+coordination,movement of the body- or management of a group,,false
+core,the central or most important part of a system or thing,,false
+corporate,relating to a group- company or corporation,,false
+corresponding,similar to or anticipated,,false
+couple,to link together,,false
+create,to make something new or invent something,,false
+credit,to recognize a person's contribution to a task,,false
+criteria,the rules or guidelines to test or evaluate something,,false
+crucial,extremely important,,false
+cultural,relating to the customs and beliefs of a certain group,,false
+currency,money or acceptance,,false
+cycle,a series of events which repeat in a predictable order,,false
+data,information from which conclusions may be drawn,,false
+debate,a serious discussion involving many people,,false
+decades,periods of ten years- or a long time,,false
+decline,to get weaker or diminish- or to refuse something,,false
+deduction,the act of finding a logical answer or opinion,,false
+definite,certain or clear,,false
+definition,an explanation of a word or phrase,,false
+demonstrate,to show or explain how something works,,false
+denote,to indicate- or act as a symbol for,,false
+deny,to refuse- not admit- or say that something is not true,,false
+depression,unhappiness- or a period of little business activity,,false
+derived,formed or developed from something else,,false
+design,a plan of something or how its parts are arranged,,false
+despite,without taking notice of or being influenced by,,false
+detected,noticed- or discovered using instruments,,false
+deviation,difference from the norm or what is usual or expected,,false
+device,scheme or thing invented for a specific purpose,,false
+devoted,gave time or effort to a purpose- activity or person,,false
+differentiation,the process of making something different,,false
+dimensions,aspects- or the length- width and height of something,,false
+diminished,made smaller in size or importance,,false
+discretion,careful consideration for others- or the right to choose,,false
+discrimination,biased and unfair treatment of a person or group,,false
+displacement,movement of people or thing away from a place,,false
+display,show- or arrange something to be seen,,false
+disposal,the process of getting rid of something,,false
+distinction,a specific difference between two similar things,,false
+distortion,change of shape- or inaccurate description or reporting,,false
+distribution,the way in which things or people are spread about,,false
+diversity,variety of opinions- styles- social groups or living things,,false
+document,to record the details of a process or event,,false
+domain,an area of interest- or an area controlled by someone,,false
+domestic,relating to home or country,,false
+dominant,stronger than others of the same group or type,,false
+draft,a piece of text or plan which is not in its final form,,false
+dramatic,exciting- outstanding- or very sudden,,false
+duration,period of time that something lasts,,false
+dynamic,relating to energy- motion- or change,,false
+economic,relating to money or trade,,false
+edition,a version or a batch of a publication in a series,,false
+elements,the basic principles of a subject of study,,false
+eliminate,to get rid of- remove- or leave out,,false
+emerged,became known- or appeared out of something,,false
+emphasis,the importance or special consideration of something,,false
+empirical,based on observation or experiment,,false
+enable,to make something possible- practical or easy to do,,false
+encountered,met unexpectedly- or experienced something undesired,,false
+energy,power or ability to be physically or mentally active,,false
+enforcement,to make or force something to happen or be accepted,,false
+enhanced,improved in quality- intensity- or value,,false
+enormous,very big,,false
+ensure,to make certain that something will happen,,false
+entities,things- real or abstract- which exist independently,,false
+environment,the conditions one lives in and their effects,,false
+equation,a statement showing the equivalence of two things,,false
+equipment,necessary items for a particular activity of purpose,,false
+equivalent,being equal to or effectively the same as,,false
+erosion,gradual weakening or damage caused by nature,,false
+error,mistake or wrong decision,,false
+established,conventional or conforming to accepted standards,,false
+estate,all of a person's property or wealth,,false
+estimate,a guess of the size- number or amount of something,,false
+ethical,morally right,,false
+ethnic,of a national- racial- religious or linguistic group,,false
+evaluation,judgment of the value or quality of something,,false
+eventually,finally- or ultimately,,false
+evidence,one or more reasons for believing something,,false
+evolution,a gradual process of change- or Darwin's theory,,false
+exceed,to be more than a number- amount or allowed limit,,false
+excluded,deliberately didn't include something,,false
+exhibit,to show. display or reveal,,false
+expansion,an increase in size of something,,false
+expert,a person with great skill or knowledge of a subject,,false
+explicit,clear and detailed- not implicit,,false
+exploitation,good use of resources- or unfair use of people,,false
+export,to send goods to another country,,false
+exposure,being affected by something in a particular place,,false
+external,relating to or existing outside,,false
+extract,to get from source- pull out- or get by force,,false
+facilitate,to make something easy or easier to do,,false
+factors,facts which contribute to the result of something,,false
+features,the important or typical parts of something,,false
+federal,relating to a central government,,false
+fees,an amount of money paid for a piece of work or service,,false
+file,to store in order or record officially,,false
+final,last,,false
+financial,relating to the management of money,,false
+finite,countable- or having an end or limit,,false
+flexibility,ability to bend- change or be changed,,false
+fluctuations,irregular variations- or rises and falls,,false
+focus,the center of interest- activity- or attention,,false
+format,arrangement- layout or plan,,false
+formula,a standard way of making or doing something,,false
+forthcoming,happening soon,,false
+foundation,fundamental principle- or establishment,,false
+founded,brought into existence- or based an idea on something,,false
+framework,an outline or basic description of a complex process,,false
+function,the purpose of something- or the duty of a person,,false
+funds,money available for a specific purpose,,false
+fundamental,basic- central- or more important than anything else,,false
+furthermore,in addition,,false
+gender (n),giống đực-cái,,false
+generate (v),tạo ra- tạo thành- phát điện,,false
+generation (n),thế hệ,,false
+globe (n),địa cầu,,false
+goal (n),mục tiêu- mục đích,,false
+grade (n),tầng lớp,,false
+grant (n),sự cho- cấp cho - trợ cấp,,false
+guarantee (n),sự bảo đảm - sư cam đoan,,false
+guideline (n),hướng dẫn- chỉ dẫn,,false
+hence (adv),do đó- vì thế- như vậy,,false
+hierarchy(n),hệ thống- cấp bậc,,false
+highlight (n-v),nhấn mạnh- làm nổi bật,,false
+hypothesis (n),giả thuyết- giả định,,false
+identical (adj),giống nhau- đồng nhất- tương đồng,,false
+identify (v),nhận định- xác đinh- khám phá ra,,false
+ideology (n),tư tưởng- lý tưởng,,false
+ignored (v),bơ- không thèm để ý,,false
+illustrate (v),minh hoạ làm rõ ý,,false
+image (n),hình ảnh,,false
+immigration,the act of arriving at a country in order to live there,,false
+impact,a powerful effect that something has on a situation,,false
+implementation,the realization of a plan- idea or policy,,false
+implications,the possible consequences an event may bring,,false
+implicit,understood without being said,,false
+implies,suggests something without saying directly,,false
+imposed,forced a rule- or made someone accept an idea,,false
+incentive,something that encourages or motivates a person to do,,false
+incidence,occurrence or rate of occurrence of something,,false
+inclination,slope- or the way a person feels about something,,false
+income,money earned by doing work or gained by investing,,false
+incompatible,unable to exist or work together effectively,,false
+incorporated,as a corporation- or combined into one thing,,false
+index,reference list arranged alphabetically- or scale,,false
+indicate,to show- point out- or make clear,,false
+individual,a single person or thing when compared to a group,,false
+induced,caused to happen- or persuaded to do,,false
+inevitably,as expected- or in a way that can not be avoided,,false
+inferred,conclude from evidence or logical thinking,,false
+infrastructure,basic organization of a system- or public services,,false
+inherent,existing as a natural and basic part of something,,false
+inhibition,the process of slowing down- restraining- or stopping,,false
+initial,existing or occurring at the beginning,,false
+initiatives,introductory steps,,false
+injury,damage to a person's body after an accident or attack,,false
+innovation,invention or new idea or way of doing something,,false
+input,contribution- or something that goes into a process,,false
+insert,to put something into something else,,false
+insights,discoveries or clear understandings of a complex issue,,false
+inspection,careful or critical viewing or examination,,false
+instance,an occurrence of something,,false
+institute,an organization that does scientific or educational work,,false
+instructions,information about how to do something,,false
+integral,necessary or important to complete a whole,,false
+integration,to combine two or more things into a coherent whole,,false
+integrity,wholeness- honesty- or having principles,,false
+intelligence,capacity to acquire and apply knowledge,,false
+intensity,strength of concentration of something,,false
+interaction,communication- or the action of things on each other,,false
+intermediate,between two extremes or in the middle,,false
+internal,relating to or existing inside,,false
+interpretation,an explanation or opinion of what something means,,false
+interval,a short period of time between one event and the next,,false
+intervention,become involved in a situation in order to improve it,,false
+intrinsic,basic and essential- or by itself,,false
+investigation,a detailed study of examination of a problem or crime,,false
+investment,the act of spending time or money in pursuit of gain,,false
+invoked,used law or power to improve a situation,,false
+involved,complicated or difficult to understand,,false
+isolated,separated- or found the cause of something,,false
+issues,problems that people are thinking or talking about,,false
+items,the things which are part of a list or group,,false
+job (n),công việc- việc làm,,false
+journal (n),báo hàng ngày- nhật kí,,false
+justify,biện minh cho- bào chữa- biện hộ,,false
+label (n-v),nhãn mác- nhãn hiệu- danh hiệu- dán nhãn,,false
+labor (n-v),lao động- nỗ lực- dốc sức,,false
+layer (n),tầng đất- tầng lớp (địa lý-địa chất),,false
+lecture (n-v),bài thuyết trình- diễn thuyết,,false
+legal (adj),hợp pháp- theo pháp luật,,false
+legislate (v),ban hành luật pháp- làm luật,,false
+levy (n-v),thu thuế- tuyển chọn,,false
+liberal (adj),hào phóng- tự do- dưa thừa,,false
+license (v-n),cho phép- cấp giấy phép- đăng kí- bằng,,false
+likewise (adv),tương tự- cũng thế- cũng như vậy,,false
+link (v),liên kết- kết nối- kết hợp,,false
+locate (v),vị trí- toạ độ - xác định vị trí,,false
+logic (n),lí luận- tính logic,,false
+maintenance,the act of keeping something in its present state,,false
+major,more important than others of the same type,,false
+manipulation,influence- or control of something using hands,,false
+manual,relating to- involving or done with hands,,false
+marginal,small in amount or effect- or barely acceptable,,false
+mature,completely grown or developed- or like an adult,,false
+maximum,an upper limit of something,,false
+mechanism,a process or sequence of steps within a system,,false
+media,television- radio- newspapers or magazines,,false
+mediation,negotiation between groups in conflict with each other,,false
+medical,relating to the study or practice of medicine,,false
+medium,means of transmitting- transporting- or communicating,,false
+mental,of the mind,,false
+method,a way of doing something,,false
+migration,movement of a group from one region to another,,false
+military,relating to war or armed forces,,false
+minimal,very small- the smallest possible- or barely enough,,false
+minimized,reduced to a minimum- or made unimportant,,false
+minimum,a lower limit of something,,false
+ministry,a government department- or the service of a minister,,false
+minorities,groups of people who differ from the larger group,,false
+mode,manner- way or form,,false
+modified,changed just a little and usually for the better,,false
+monitoring,observing- recording or detecting using instruments,,false
+motivation,enthusiasm or reason for doing something,,false
+mutual,felt or shared by each other or all,,false
+negative,bad- less than zero- contradictory- or inconclusive,,false
+network,a system of things or people which are interconnected,,false
+neutral,without bias or favoritism- or having no charge,,false
+nevertheless,despite this- nonetheless- notwithstanding,,false
+nonetheless,despite this- nevertheless- notwithstanding,,false
+normal,ordinary or usual,,false
+norms,accepted or usual standards or ways,,false
+notion,idea- opinion or belief,,false
+notwithstanding,despite this- nevertheless- nonetheless,,false
+nuclear,relating to a nucleus,,false
+objective,aim or purpose,,false
+obtained,came into possession of,,false
+obvious,easy to understand,,false
+occupational,relating to work,,false
+occur,to happen- often naturally or unexpectedly,,false
+odd,unusual- not even- or irregular,,false
+offset,to counterbalance or compensate one thing for another,,false
+ongoing,in progress or happening now,,false
+option,something available as a choice- or the right to choose,,false
+orientation,direction or arrangement- aims- training or preparation,,false
+outcomes,the end results or consequences of a particular event,,false
+output,the end product- or the amount of something produced,,false
+overall,in general- considering everything,,false
+overlap,correspond or coincide in part with something,,false
+overseas,abroad- or to- from or in other countries,,false
+panel,a small group of people chosen to give their opinions,,false
+paradigm,conceptual framework- or an example of something,,false
+paragraph,group of sentences which discuss a single topic,,false
+parallel,similar- or of equal distance apart along two lengths,,false
+parameters,the facts or rules which limit how something is done,,false
+participation,the act of taking part or being involved in something,,false
+partnership,a relationship involving close cooperation,,false
+passive,accepting without resistance- or not active,,false
+perceived,saw- or generally recognized or believed to be true,,false
+percent,in proportion to a hundred,,false
+period,any length of time,,false
+persistent,continuing for a long time- or refusing to give up,,false
+perspective,a way of looking at or considering something,,false
+phase,a period of time- especially as part of a series,,false
+phenomenon,something unusual or amazing which can be sensed,,false
+philosophy,a system of beliefs that guide one's behavior,,false
+physical,of the body- or having material existence,,false
+plus,and also- or more- added to,,false
+policy,an established practice or plan of what to do,,false
+portion,part or share of a whole,,false
+posed,asked formally- caused a problem- or stayed in position,,false
+positive,certain about something,,false
+potential,the capacity to develop- succeed or achieve,,false
+practitioners,people involved in an activity or job requiring skill,,false
+preceding,coming before something or someone else,,false
+precise,exact or careful and accurate,,false
+predicted,said that something would happen in the future,,false
+predominantly,mainly or mostly,,false
+preliminary,prior to or in preparation for the main activity or event,,false
+presumption,an attitude based on probability rather than proof,,false
+previous,occurring or existing before something or someone else,,false
+primary,more important than anything else,,false
+prime,the main or most important- or the best quality,,false
+principal,the first- main- or most important,,false
+principle,a basic generalization that is accepted as true,,false
+prior,coming before something else in time or importance,,false
+priority,something important that comes first or before others,,false
+procedure,a course of action intended to achieve a result,,false
+process,a series of actions taken to achieve a result,,false
+professional,relating to or conforming to the standards of work,,false
+prohibited,prevented- or refused to allow,,false
+project,work or a study of a subject over a period of time,,false
+promote,to raise someone or something to a higher level,,false
+proportion,the size of something when compared to the whole,,false
+prospect,anticipation- or probability of a favorable outcome,,false
+protocol,set of rules and procedures,,false
+psychology,study of how the mind works and affects behavior,,false
+publication,printed item such as a book- magazine or journal,,false
+published,made known to the public through writing,,false
+purchase,buy,,false
+pursue,to follow- try to get- or try to discover information,,false
+qualitative (adj),thuộc về tính chất- định chất,,false
+quote,lời trích dẫn,,false
+radical,fundamental or extreme,,false
+random,without pattern or plan,,false
+range,the upper and lower limits of something,,false
+ratio,a comparison of two things expressed as a number,,false
+rational,logical or based on reason,,false
+reaction,behavior or action as a result of a particular event,,false
+recovery,return to normal- or getting back something lost,,false
+refine,improve something through small changes,,false
+regime,a particular government or controlling group or system,,false
+region,a geographical or physical area,,false
+registered,recorded and accepted by a group or organization,,false
+regulations,rules issued by an authority,,false
+reinforced,gave support to something,,false
+rejected,refused to accept- make use of- or give affection to,,false
+relaxed,made rules or controls less severe,,false
+release,to let go or let out,,false
+relevant,correct or suitable for a particular purpose,,false
+reliance,the tendency to trust in someone or something,,false
+reluctant,unwilling or hesitant,,false
+removed,took away,,false
+required,needed or made necessary,,false
+research,a detailed study of a subject,,false
+resident,a person who lives at a particular place,,false
+resolution,a course of action which is decided purposefully,,false
+resources,money- valuable possessions- or natural materials,,false
+response,an answer or reaction to a question or statement,,false
+restore,to return to a previous condition or position,,false
+restraints,limitations or controls of the freedom of something,,false
+restricted,with limitations- or available only to a select few,,false
+retained,kept or continued to have,,false
+revealed,showed or made known,,false
+revenue,income that a company or government receives,,false
+reverse,opposite or back,,false
+revision,a change of the words of a text,,false
+revolution,a sudden or important change in a situation,,false
+rigid,stiff and fixed- or not able to be changed or persuaded,,false
+role,a function or part performed in a specific process,,false
+route,way between places- or method of achieving something,,false
+scenario,imagined event- or model of expected outcomes,,false
+schedule,a plan of activities organized by time,,false
+scheme,an organized plan- or an outline of a system or thing,,false
+scope,range covered- or opportunity,,false
+section,a distinct part of something,,false
+sector,a geographic or economic area,,false
+security,protection of a person- property or organization,,false
+select,to choose- especially after careful consideration,,false
+sequence,a series- or the order in which things are arranged,,false
+series,a sequence of similar or related things,,false
+sex,the state of being either female or male,,false
+shift,a change in position- direction or conditions,,false
+significant,noticeable- meaningful or important,,false
+similar,almost but not exactly the same,,false
+simulation,model of the essential features of a process or thing,,false
+site,a place where something was- is- or will be,,false
+so-called,commonly or falsely called,,false
+solely,only and exclusively,,false
+somewhat,slightly or rather,,false
+sought,simple past and past participle of seek,,false
+source,the cause of something or place it comes from,,false
+specific,relating to one thing and not others,,false
+specified,stated clearly or described accurately,,false
+sphere,area of interest- knowledge or control,,false
+stability,resistance to change- or constancy of character,,false
+statistics,a branch of applied mathematics that analyzes data,,false
+status,the relative position of someone or something,,false
+straightforward,easy to understand- or honest and frank,,false
+strategies,detailed plans or methods for achieving success,,false
+stress,to give emphasis or special attention to something,,false
+structure,the way parts of a system or object are arranged,,false
+styles,types- expressions- or ways of doing something,,false
+submitted,presented for consideration- or gave in to,,false
+subordinate,of less importance or lower status,,false
+subsequent,happening after something else,,false
+subsidiary,of lesser importance,,false
+substitution,the replacement of one thing by another,,false
+successive,following in sequence and without a break,,false
+sufficient,as much as is needed for a particular purpose,,false
+sum,the total number or amount of things added together,,false
+summary,a short description of the main points of something,,false
+supplementary,extra- or supplying what is lacking,,false
+survey,a series of questions used to gather personal data,,false
+survive,to continue to live or exist,,false
+suspended,stopped something temporarily or permanently,,false
+sustainable,able to be continued or maintained,,false
+symbolic,representing something else- or ineffective,,false
+tapes,recordings of sound or pictures,,false
+target,aim- thing to be aimed at- or who something is for,,false
+task,a piece of work that is either difficult or unpleasant,,false
+team,organized group of people who work cooperatively,,false
+technical,relating to specialized words of a specific subject,,false
+techniques,ways of doing an activity that requires skill,,false
+technology,the study of practical uses of scientific discoveries,,false
+temporary,for a limited period,,false
+tension,nervousness or uneasiness,,false
+termination,end of something- or process of ending something,,false
+text,the words printed on a page other than the headings,,false
+theme,topic of speech or writing,,false
+theory,an organized system of accepted knowledge,,false
+thereby,as a result or this,,false
+thesis,long academic paper based on original research,,false
+topic,subject of a text or discussion,,false
+trace,to find or discover by careful searching or research,,false
+traditional,the usual ways or customs of a group of people,,false
+transfer,to move from one place to another,,false
+transformation,a complete change or the process of change,,false
+transition,a process or period in which something changes,,false
+transmission,process of passing or sending something invisible,,false
+transport,to carry from one place to another,,false
+trend,fashion- or change in people's behavior or attitude,,false
+trigger,cause- or set off an action or series of actions,,false
+ultimate (n-adj),cuối cùng- sau cùng- nguyen tắc cơ bản,,false
+undergo (v),chịu đựng- trải qua- chịu sự đau khổ,,false
+underlie (v),làm cơ sở- làm nển tảng cho,,false
+unify (v),hợp nhất- thống nhất- đoàn kết,,false
