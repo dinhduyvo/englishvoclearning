@@ -12,6 +12,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCarouselModule } from '@ngbmodule/material-carousel';
+import { ElectronService } from 'ngx-electron';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { MatCarouselModule } from '@ngbmodule/material-carousel';
     MatCarouselModule.forRoot(),
   ],
   providers: [
-    AppService
+    AppService,
+    ElectronService
   ],
   bootstrap: [AppComponent]
 })
