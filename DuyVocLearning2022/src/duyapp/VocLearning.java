@@ -1,7 +1,5 @@
 package duyapp;
 
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,12 +29,11 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import duyapp.dtos.Word;
 import duyapp.model.FileModel;
-import duyapp.model.IDataModel;
 
 public class VocLearning {
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	private IDataModel fileModel;
+	
 	protected Shell shell;
 
 	public Label lblWord;
@@ -58,8 +55,6 @@ public class VocLearning {
 	private Display display;
 
 	private boolean runTimer = true;
-
-	protected List<Word> wordList;
 
 	private int currentIndex = 0;
 
@@ -91,8 +86,8 @@ public class VocLearning {
 	private Button btnNext;
 	
 	public VocLearning() {
-		fileModel = new FileModel();
-		fileModel.createConnection("data.csv");
+		ShareData.fileModel = new FileModel();
+		ShareData.fileModel.createConnection("data.csv");
 	}
 
 	/**
@@ -133,12 +128,12 @@ public class VocLearning {
 	}
 
 	public void setDataByIndex() {
-		if (this.wordList.size() > 0) {
+		if (ShareData.wordList.size() > 0) {
 
-			if (this.currentIndex == this.wordList.size())
+			if (this.currentIndex == ShareData.wordList.size())
 				this.currentIndex = 0;
 			
-			Word tmpWord = this.wordList.get(this.currentIndex);
+			Word tmpWord = ShareData.wordList.get(this.currentIndex);
 			if (!chkShowRemembered.getSelection() && tmpWord.remember) {
 				this.currentIndex++;
 				nextTimer();
@@ -147,7 +142,7 @@ public class VocLearning {
 			setData(tmpWord.word, tmpWord.meaning, tmpWord.description, tmpWord.remember);
 			if (this.clickPrevious) {
 				if (this.currentIndex == 0) {
-					this.currentIndex = this.wordList.size() - 1;
+					this.currentIndex = ShareData.wordList.size() - 1;
 				} else {
 					this.currentIndex--;
 				}
@@ -288,6 +283,19 @@ public class VocLearning {
 		btnRemove.setBounds(111, 1, 75, 25);
 		formToolkit.adapt(btnRemove, true, true);
 		btnRemove.setText("\u274C Remove");
+		
+		Button btnAdd = new Button(composite_1, SWT.NONE);
+		btnAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EditDialog dlg = new EditDialog(shell, SWT.CLOSE);
+				
+				dlg.open();
+			}
+		});
+		btnAdd.setBounds(190, 1, 75, 25);
+		formToolkit.adapt(btnAdd, true, true);
+		btnAdd.setText("\u2795 Add");
 		composite_2.setLayout(null);
 		FormData fd_composite_2 = new FormData();
 		fd_composite_2.right = new FormAttachment(composite, 0, SWT.RIGHT);
@@ -333,7 +341,7 @@ public class VocLearning {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					wordList = fileModel.getList();
+					ShareData.wordList = ShareData.fileModel.getList();
 					currentIndex = 0;
 					nextTimer();
 				} catch (Exception e1) {
@@ -361,7 +369,7 @@ public class VocLearning {
 		this.formToolkit.paintBordersFor((Composite) spinner);
 		spinner.setSelection(this.timeOutNumber / 1000);
 		try {
-			wordList = fileModel.getList();
+			ShareData.wordList = ShareData.fileModel.getList();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -373,11 +381,11 @@ public class VocLearning {
 	 * @param e
 	 */
 	private void chkRememberClicked(Button e) {
-		wordList.get(currentIndex).remember = e.getSelection();
+		ShareData.wordList.get(currentIndex).remember = e.getSelection();
 		if (!isSaving) {
 			isSaving = true;
 			try {
-				fileModel.saveData(wordList);
+				ShareData.fileModel.saveData(ShareData.wordList);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -414,11 +422,11 @@ public class VocLearning {
 	}
 	
 	private void btnRemoveClick(SelectionEvent e) {
-		wordList.remove(currentIndex - 1);
+		ShareData.wordList.remove(currentIndex - 1);
 		if (!isSaving) {
 			isSaving = true;
 			try {
-				fileModel.saveData(wordList);
+				ShareData.fileModel.saveData(ShareData.wordList);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
