@@ -3,6 +3,8 @@ package duyapp;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -11,6 +13,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import duyapp.dtos.Word;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class EditDialog extends Dialog {
 
@@ -18,8 +21,6 @@ public class EditDialog extends Dialog {
 	protected Shell shlAddEdit;
 	private Text txtWord;
 	private Text txtMeaning;
-	private Text txtDesc;
-	private Label lblRemember;
 
 	/**
 	 * Create the dialog.
@@ -37,6 +38,11 @@ public class EditDialog extends Dialog {
 	 */
 	public Object open() {
 		createContents();
+		Rectangle parentSize = getParent().getBounds();
+		Rectangle shellSize = shlAddEdit.getBounds();
+		int locationX = (parentSize.width - shellSize.width)/2+parentSize.x;
+		int locationY = (parentSize.height - shellSize.height)/2+parentSize.y;
+		shlAddEdit.getShell().setLocation(new Point(locationX, locationY));
 		shlAddEdit.open();
 		shlAddEdit.layout();
 		Display display = getParent().getDisplay();
@@ -52,38 +58,32 @@ public class EditDialog extends Dialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		shlAddEdit = new Shell(getParent(), getStyle());
-		shlAddEdit.setSize(450, 300);
+		shlAddEdit = new Shell(getParent(), SWT.APPLICATION_MODAL);
+		shlAddEdit.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		shlAddEdit.setImage(SWTResourceManager.getImage(EditDialog.class, "/duyapp/icon.png"));
+		shlAddEdit.setSize(450, 156);
 		shlAddEdit.setText("Add / Edit Word");
 		shlAddEdit.setLayout(null);
 		
 		Label lblNewLabel = new Label(shlAddEdit, SWT.NONE);
-		lblNewLabel.setBounds(21, 23, 32, 15);
+		lblNewLabel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		lblNewLabel.setBounds(55, 23, 32, 15);
 		lblNewLabel.setText("Word:");
 		
 		txtWord = new Text(shlAddEdit, SWT.BORDER);
-		txtWord.setBounds(107, 20, 297, 21);
+		txtWord.setBounds(124, 20, 297, 25);
 		
 		Label lblMeaning = new Label(shlAddEdit, SWT.NONE);
-		lblMeaning.setBounds(21, 67, 50, 15);
+		lblMeaning.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		lblMeaning.setBounds(55, 67, 50, 15);
 		lblMeaning.setText("Meaning:");
 		
-		Label lblDescription = new Label(shlAddEdit, SWT.NONE);
-		lblDescription.setBounds(21, 115, 63, 15);
-		lblDescription.setText("Description:");
-		
 		txtMeaning = new Text(shlAddEdit, SWT.BORDER);
-		txtMeaning.setBounds(107, 64, 297, 21);
-		
-		txtDesc = new Text(shlAddEdit, SWT.BORDER);
-		txtDesc.setBounds(107, 112, 297, 21);
-		
-		lblRemember = new Label(shlAddEdit, SWT.NONE);
-		lblRemember.setBounds(21, 164, 80, 15);
-		lblRemember.setText("Remember?");
+		txtMeaning.setBounds(124, 64, 297, 25);
 		
 		Button chkRemember = new Button(shlAddEdit, SWT.CHECK);
-		chkRemember.setBounds(107, 164, 93, 16);
+		chkRemember.setText("Remembered");
+		chkRemember.setBounds(124, 111, 93, 16);
 		
 		Button btnOk = new Button(shlAddEdit, SWT.NONE);
 		btnOk.addSelectionListener(new SelectionAdapter() {
@@ -92,7 +92,6 @@ public class EditDialog extends Dialog {
 				Word w = new Word();
 				w.meaning = txtMeaning.getText();
 				w.word = txtWord.getText();
-				w.description = txtDesc.getText();
 				w.remember = chkRemember.getSelection();
 				ShareData.wordList.add(w);
 				try {
@@ -103,8 +102,8 @@ public class EditDialog extends Dialog {
 				shlAddEdit.close();
 			}
 		});
-		btnOk.setBounds(107, 210, 75, 25);
-		btnOk.setText("OK");
+		btnOk.setBounds(265, 107, 75, 25);
+		btnOk.setText("\uD83D\uDCBE OK");
 		
 		Button btnCancel = new Button(shlAddEdit, SWT.NONE);
 		btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -113,8 +112,13 @@ public class EditDialog extends Dialog {
 				shlAddEdit.close();
 			}
 		});
-		btnCancel.setBounds(188, 210, 75, 25);
-		btnCancel.setText("Cancel");
+		btnCancel.setBounds(346, 107, 75, 25);
+		btnCancel.setText("\u274C Cancel");
+		
+		Label label = new Label(shlAddEdit, SWT.NONE);
+		label.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		label.setBounds(-2, 0, 32, 197);
+		label.setText("  ");
 
 	}
 }
