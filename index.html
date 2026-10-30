@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LexiFlow — Adaptive Real-Life English Vocabulary</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    h1, h2, h3, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.72);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    html:not(.dark) .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06);
+    }
+    .card-flip-enter {
+      animation: popIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+    }
+    .pulse-btn { animation: pulseGlow 2.2s infinite; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+  <!-- Top Notification Toast -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+  <!-- Placement Diagnostic Modal -->
+  <div id="placementModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+    <div class="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-indigo-500/30 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          Adaptive Level Calibration
+        </span>
+        <button id="closePlacementBtn" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/60" title="Close">
+          ✕
+        </button>
+      </div>
+      <div id="placementContent"></div>
+    </div>
+  </div>
+
+  <!-- Main Layout Shell (Desktop Sidebar + Mobile Bottom Nav) -->
+  <div class="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto">
+
+    <!-- Left Navigation Sidebar (PC / MacBook) -->
+    <aside class="hidden lg:flex lg:w-64 xl:w-72 flex-col justify-between p-5 border-r border-slate-800/80 shrink-0 select-none">
+      <div>
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3 px-2 mb-8">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/25 font-display font-extrabold text-white text-xl">
+            L
+          </div>
+          <div>
+            <div class="font-display font-bold text-lg tracking-tight flex items-center gap-2">
+              LexiFlow
+              <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Sync</span>
+            </div>
+            <p class="text-xs text-slate-400">Adaptive Real-Life Vocab</p>
+          </div>
+        </div>
+
+        <!-- Adaptive User Level Card -->
+        <div class="glass-card rounded-2xl p-4 mb-6 border border-indigo-500/20">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Current Level</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="sidebarLevelBadge" class="font-display font-extrabold text-xl text-indigo-400">B2</span>
+                <span id="sidebarLevelTitle" class="text-xs font-medium text-slate-300">Upper-Intermediate</span>
+              </div>
+            </div>
+            <button id="openPlacementBtnSidebar" class="text-xs px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-medium transition">
+              Test Level
+            </button>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-2">
+            <div id="sidebarLevelProgress" class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 45%"></div>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1.5">
+            <span id="sidebarEloText">Adaptive Score: 1450</span>
+            <span id="sidebarNextTierText">Next: C1 (1600)</span>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="space-y-1.5" id="desktopNav">
+          <button data-tab="dashboard" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/25">
+            <span class="flex items-center gap-3"><span class="text-base">🏠</span><span>Dashboard & Feed</span></span>
+          </button>
+          <button data-tab="study" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all">
+            <span class="flex items-center gap-3"><span class="text-base">🧠</span><span>Smart SRS Cards</span></span>
+            <span id="dueCountBadgeDesktop" class="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">5</span>
+          </button>
+          <button data-tab="practice" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all">
+            <span class="flex items-center gap-3"><span class="text-base">💬</span><span>Real-Life Lab</span></span>
+          </button>
+          <button data-tab="arcade" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all">
+            <span class="flex items-center gap-3"><span class="text-base">⚡</span><span>Word Rush Game</span></span>
+            <span class="px-2 py-0.5 text-[10px] rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">FUN</span>
+          </button>
+          <button data-tab="discover" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all">
+            <span class="flex items-center gap-3"><span class="text-base">🌐</span><span>External Sources</span></span>
+          </button>
+          <button data-tab="sync" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all">
+            <span class="flex items-center gap-3"><span class="text-base">🔄</span><span>PC / Mac / Android Sync</span></span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Quick Controls -->
+      <div class="pt-4 border-t border-slate-800/80 space-y-3">
+        <div class="flex items-center justify-between px-2">
+          <button id="soundToggleBtn" class="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition">
+            <span id="soundIcon">🔊</span>
+            <span id="soundLabel">SFX On</span>
+          </button>
+          <button id="themeToggleBtn" class="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition">
+            <span id="themeIcon">🌙</span>
+            <span id="themeLabel">Dark Theme</span>
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-500 px-2 flex items-center justify-between">
+          <span>Auto-saved locally</span>
+          <span id="lastSyncIndicator" class="text-emerald-400 font-medium">● Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 pb-24 lg:pb-8">
+      <!-- Top Header Bar -->
+      <header class="sticky top-0 z-30 backdrop-blur-xl bg-slate-950/75 border-b border-slate-800/80 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 lg:hidden">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-400 flex items-center justify-center font-display font-extrabold text-white text-lg">
+            L
+          </div>
+          <div>
+            <span class="font-display font-bold text-base">LexiFlow</span>
+            <span id="mobileLevelPill" class="ml-1.5 px-2 py-0.5 text-[11px] font-bold rounded-full bg-indigo-500/20 text-indigo-300">B2</span>
+          </div>
+        </div>
+
+        <div class="hidden lg:block">
+          <h1 id="pageHeaderTitle" class="font-display font-bold text-xl">Adaptive Learning Hub</h1>
+          <p id="pageHeaderSubtitle" class="text-xs text-slate-400">Curated words matched to your level from live external dictionaries & corpora</p>
+        </div>
+
+        <!-- Gamified Stats Bar -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-semibold" title="Daily Learning Streak">
+            <span>🔥</span>
+            <span id="streakStat">3</span>
+            <span class="hidden sm:inline text-slate-400 font-normal">days</span>
+          </div>
+          <div class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-semibold" title="Total Experience Points">
+            <span>✨</span>
+            <span id="xpStat" class="text-indigo-400">420</span>
+            <span class="hidden sm:inline text-slate-400 font-normal">XP</span>
+          </div>
+          <div class="glass-card px-3 py-1.5 rounded-xl hidden sm:flex items-center gap-1.5 text-xs sm:text-sm font-semibold" title="Words Mastered">
+            <span>🏆</span>
+            <span id="masteredStat" class="text-emerald-400">0</span>
+            <span class="text-slate-400 font-normal">mastered</span>
+          </div>
+          <button id="viModeToggleBtn" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition flex items-center gap-1.5" title="Toggle Vietnamese translations and detailed explanations">
+            <span>🇻🇳</span>
+            <span id="viModeLabel">Giải nghĩa TV: BẬT</span>
+          </button>
+          <button id="quickFetchHeaderBtn" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition flex items-center gap-1.5">
+            <span>＋</span>
+            <span>Auto-Fetch Words</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Views Container -->
+      <div class="p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto space-y-6">
+
+        <!-- ======================= 1. DASHBOARD VIEW ======================= -->
+        <section id="view-dashboard" class="tab-view space-y-6">
+          <!-- Hero Banner -->
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900/90 via-slate-900 to-emerald-950/80 border border-indigo-500/30 p-6 sm:p-8 shadow-2xl">
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div class="space-y-2 max-w-xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-indigo-200 text-xs font-medium">
+                  <span>🎯</span>
+                  <span id="heroAdaptiveNote">Adaptive Engine Active • Tailored to CEFR B2</span>
+                </div>
+                <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-white leading-tight">
+                  Learn words you'll actually use in real conversations.
+                </h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  No manual word lists needed. LexiFlow pulls authentic vocabulary from external linguistic sources, adapts to your accuracy in real time, and trains you with spaced repetition & realistic scenarios.
+                </p>
+                <div class="pt-2 flex flex-wrap gap-3">
+                  <button id="startDailySessionBtn" class="pulse-btn px-5 py-2.5 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition flex items-center gap-2">
+                    <span>🚀</span>
+                    <span>Start Smart Review (<span id="heroDueCount">5</span> due)</span>
+                  </button>
+                  <button id="heroPracticeBtn" class="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition flex items-center gap-2">
+                    <span>💬</span>
+                    <span>Real-Life Context Lab</span>
+                  </button>
+                  <button id="openPlacementBtnHero" class="px-4 py-2.5 rounded-2xl border border-indigo-400/40 hover:bg-indigo-500/20 text-indigo-200 font-semibold text-sm transition">
+                    Calibrate My Level
+                  </button>
+                </div>
+              </div>
+
+              <!-- Adaptive Radar / Progress Card -->
+              <div class="w-full md:w-64 glass-card rounded-2xl p-4 border border-white/10 shrink-0 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-300">Daily Goal Progress</span>
+                  <span id="dailyGoalBadge" class="text-xs font-bold text-emerald-400">0 / 50 XP</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div id="dailyGoalBar" class="bg-gradient-to-r from-emerald-400 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1 text-center">
+                  <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800">
+                    <div id="dashAccuracy" class="font-display font-bold text-lg text-white">92%</div>
+                    <div class="text-[11px] text-slate-400">Recall Rate</div>
+                  </div>
+                  <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800">
+                    <div id="dashTotalWords" class="font-display font-bold text-lg text-indigo-400">12</div>
+                    <div class="text-[11px] text-slate-400">Active Deck</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level & Topic Filter Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-4 rounded-2xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1">Your Level:</span>
+              <button data-level="A2" class="level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:border-indigo-500 transition">A2 Essential</button>
+              <button data-level="B1" class="level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:border-indigo-500 transition">B1 Practical</button>
+              <button data-level="B2" class="level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-indigo-500 bg-indigo-500/20 text-indigo-300 transition">B2 Fluent</button>
+              <button data-level="C1" class="level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:border-indigo-500 transition">C1 Advanced</button>
+              <button data-level="C2" class="level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:border-indigo-500 transition">C2 Mastery</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="topicFilterSelect" class="text-xs text-slate-400 font-medium">Topic:</label>
+              <select id="topicFilterSelect" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option value="all">All Real-Life Contexts</option>
+                <option value="work">Tech, Work & Career</option>
+                <option value="social">Daily Chat & Social</option>
+                <option value="travel">Travel & Culture</option>
+                <option value="mind">Psychology & Decisions</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Word Mastery Grid -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-display font-bold text-lg">Your Adaptive Word Stream</h3>
+                <p class="text-xs text-slate-400">Click any word card to hear pronunciation, inspect real-life collocations, or practice immediately.</p>
+              </div>
+              <span id="filteredWordCount" class="text-xs font-semibold text-slate-400">Showing words</span>
+            </div>
+            <div id="dashboardWordGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+        </section>
+
+        <!-- ======================= 2. SMART SRS CARDS VIEW ======================= -->
+        <section id="view-study" class="tab-view hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-4 rounded-2xl">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">SM-2 Spaced Repetition</span>
+                <span id="srsQueueCounter" class="text-xs text-slate-400 font-medium">Card 1 of 5</span>
+              </div>
+              <h2 class="font-display font-bold text-lg mt-1">Active Recall & Real-Life Context</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="srsShuffleBtn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition">
+                🔀 Mix Queue
+              </button>
+              <button id="srsLoadMoreBtn" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
+                ＋ Pull External Words
+              </button>
+            </div>
+          </div>
+
+          <!-- Flashcard Container -->
+          <div id="srsCardWrapper" class="glass-card rounded-3xl p-6 sm:p-8 border border-indigo-500/25 shadow-2xl min-h-[420px] flex flex-col justify-between card-flip-enter"></div>
+        </section>
+
+        <!-- ======================= 3. REAL-LIFE LAB (PRACTICAL USAGE) ======================= -->
+        <section id="view-practice" class="tab-view hidden space-y-6">
+          <!-- Mode Switcher -->
+          <div class="glass-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="font-display font-bold text-lg">Real-Life Practical Lab</h2>
+              <p class="text-xs text-slate-400">Don't just memorize definitions—practice how native speakers actually use these words.</p>
+            </div>
+            <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
+              <button data-pmode="dialogue" class="pmode-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">
+                💬 Conversation Cloze
+              </button>
+              <button data-pmode="sentence" class="pmode-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+                ✍️ Sentence Lab
+              </button>
+              <button data-pmode="nuance" class="pmode-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
+                🎭 Register & Nuance
+              </button>
+            </div>
+          </div>
+
+          <!-- Practice Mode 1: Conversation Cloze -->
+          <div id="practice-dialogue" class="practice-panel glass-card rounded-3xl p-6 sm:p-8 border border-indigo-500/20 space-y-6"></div>
+
+          <!-- Practice Mode 2: Sentence Builder & Smart Validator -->
+          <div id="practice-sentence" class="practice-panel hidden glass-card rounded-3xl p-6 sm:p-8 border border-indigo-500/20 space-y-6"></div>
+
+          <!-- Practice Mode 3: Register & Nuance Spotter -->
+          <div id="practice-nuance" class="practice-panel hidden glass-card rounded-3xl p-6 sm:p-8 border border-indigo-500/20 space-y-6"></div>
+        </section>
+
+        <!-- ======================= 4. WORD RUSH ARCADE MINI-GAME ======================= -->
+        <section id="view-arcade" class="tab-view hidden space-y-6">
+          <div class="glass-card rounded-3xl p-6 sm:p-8 border border-rose-500/30 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+              <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-bold mb-2">
+                  <span>⚡</span>
+                  <span>60-Second Speed Recall Challenge</span>
+                </div>
+                <h2 class="font-display font-extrabold text-2xl">Word Rush: Context Blitz</h2>
+                <p class="text-xs text-slate-400">Match real-life situations and collocations before the timer runs out. Consecutive hits build your XP combo multiplier!</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="bg-slate-900 px-4 py-2.5 rounded-2xl border border-slate-800 text-center">
+                  <div class="text-[10px] uppercase tracking-wider text-slate-400">Time Left</div>
+                  <div id="arcadeTimer" class="font-display font-extrabold text-xl text-rose-400">60s</div>
+                </div>
+                <div class="bg-slate-900 px-4 py-2.5 rounded-2xl border border-slate-800 text-center">
+                  <div class="text-[10px] uppercase tracking-wider text-slate-400">Combo</div>
+                  <div id="arcadeCombo" class="font-display font-extrabold text-xl text-amber-400">x1</div>
+                </div>
+                <div class="bg-slate-900 px-4 py-2.5 rounded-2xl border border-slate-800 text-center">
+                  <div class="text-[10px] uppercase tracking-wider text-slate-400">Score</div>
+                  <div id="arcadeScore" class="font-display font-extrabold text-xl text-emerald-400">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="arcadeStage" class="pt-6 min-h-[280px] flex flex-col items-center justify-center text-center"></div>
+          </div>
+        </section>
+
+        <!-- ======================= 5. EXTERNAL SOURCES AUTO-DISCOVERY ======================= -->
+        <section id="view-discover" class="tab-view hidden space-y-6">
+          <div class="glass-card rounded-3xl p-6 sm:p-8 border border-indigo-500/30 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Zero Manual Input Required
+                </span>
+                <h2 class="font-display font-bold text-2xl mt-2">External Vocabulary Streams</h2>
+                <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mt-1">
+                  Automatically pull real-world English words, phonetics, collocations, and usage examples from live linguistic APIs (Datamuse Corpus + Free Dictionary API) matched to your current CEFR level.
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-medium">
+                  ● Live API + Offline Fallback
+                </span>
+              </div>
+            </div>
+
+            <!-- Topic Stream Cards -->
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">1-Click Topic Streams (Auto-Curated for Your Level)</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                <button data-stream="technology" class="stream-pack-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">💻</span>
+                    <span class="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition">Fetch Pack →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Tech, AI & Modern Work</div>
+                  <p class="text-xs text-slate-400 mt-1">Standups, product strategy, remote collaboration & innovation terms.</p>
+                </button>
+
+                <button data-stream="conversation" class="stream-pack-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">☕</span>
+                    <span class="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition">Fetch Pack →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Natural Everyday Social</div>
+                  <p class="text-xs text-slate-400 mt-1">Expressing feelings, storytelling, subtle reactions & friendships.</p>
+                </button>
+
+                <button data-stream="travel" class="stream-pack-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">✈️</span>
+                    <span class="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition">Fetch Pack →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Global Travel & Culture</div>
+                  <p class="text-xs text-slate-400 mt-1">Navigating cities, culinary experiences, hospitality & local life.</p>
+                </button>
+
+                <button data-stream="persuasion" class="stream-pack-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">🎯</span>
+                    <span class="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition">Fetch Pack →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Leadership & Persuasion</div>
+                  <p class="text-xs text-slate-400 mt-1">Negotiating, pitching ideas, resolving bottlenecks & critical thinking.</p>
+                </button>
+
+                <button data-stream="science" class="stream-pack-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">🔬</span>
+                    <span class="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition">Fetch Pack →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Psychology & Habits</div>
+                  <p class="text-xs text-slate-400 mt-1">Mindset, cognitive biases, focus, resilience & human behavior.</p>
+                </button>
+
+                <button data-stream="random" class="stream-pack-btn text-left p-4 rounded-2xl bg-gradient-to-br from-indigo-900/50 to-purple-900/40 hover:from-indigo-900/80 hover:to-purple-900/70 border border-indigo-500/40 transition group">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-2xl">🎲</span>
+                    <span class="text-xs font-semibold text-emerald-300 group-hover:translate-x-0.5 transition">Surprise Me →</span>
+                  </div>
+                  <div class="font-display font-bold text-sm">Adaptive Smart Mix</div>
+                  <p class="text-xs text-slate-300 mt-1">Automatically picks words right at your current CEFR frontier.</p>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live External Topic / Context Search (Datamuse + Dictionary API) -->
+            <div class="pt-4 border-t border-slate-800">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Live External Dictionary & Topic Discovery</h3>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input id="externalTopicInput" type="text" placeholder="Enter any theme or word (e.g. 'coffee', 'startup', 'ocean', 'serendipity')..." class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" />
+                <button id="fetchExternalCustomBtn" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shrink-0">
+                  🔍 Discover & Import from Web
+                </button>
+              </div>
+              <div id="externalFetchResults" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================= 6. CROSS-DEVICE SYNC HUB (PC / MAC / ANDROID) ======================= -->
+        <section id="view-sync" class="tab-view hidden space-y-6">
+          <div class="glass-card rounded-3xl p-6 sm:p-8 border border-emerald-500/30 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Cross-Platform Continuity
+                </span>
+                <h2 class="font-display font-bold text-2xl mt-2">PC, MacBook & Android Sync Center</h2>
+                <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mt-1">
+                  Your progress, adaptive CEFR rating, and SRS review schedule are saved automatically and can be synced across your Windows PC, MacBook, and Android phone in two ways.
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="syncStatusBadge" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
+                  ✓ Local Storage Synced
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Method 1: Instant Sync Code (Zero Account Needed) -->
+              <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-display font-bold text-base flex items-center gap-2">
+                    <span>⚡</span>
+                    <span>1. Instant Cross-Device Sync Token</span>
+                  </h3>
+                  <span class="text-[11px] text-slate-400">No login required</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Generate a compact Base64 snapshot of your entire vocabulary deck, SRS intervals, and XP. Copy it on your PC/MacBook and paste it on your Android phone (or vice versa).
+                </p>
+                <div class="space-y-2">
+                  <label for="syncTokenOutput" class="text-xs font-semibold text-slate-300">Your Current Sync Code:</label>
+                  <textarea id="syncTokenOutput" rows="3" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-indigo-300 focus:outline-none"></textarea>
+                  <div class="flex flex-wrap gap-2">
+                    <button id="generateSyncCodeBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+                      📋 Generate & Copy Sync Code
+                    </button>
+                    <button id="downloadBackupJsonBtn" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition">
+                      ⬇️ Export .JSON Backup
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 space-y-2">
+                  <label for="syncTokenInput" class="text-xs font-semibold text-slate-300">Restore / Merge from Another Device:</label>
+                  <textarea id="syncTokenInput" rows="2" placeholder="Paste Sync Code from your PC, MacBook, or Android phone here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"></textarea>
+                  <button id="applySyncCodeBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">
+                    🔄 Apply & Sync Progress Now
+                  </button>
+                </div>
+              </div>
+
+              <!-- Method 2: Live Cloud Sync via GitHub Gist / Custom REST Endpoint -->
+              <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-display font-bold text-base flex items-center gap-2">
+                    <span>☁️</span>
+                    <span>2. Automatic Cloud Sync (GitHub Gist API)</span>
+                  </h3>
+                  <span class="text-[11px] text-indigo-400">Real-Time Cloud</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Connect a free personal GitHub Gist token to push & pull your progress with one click across PC, MacBook, and Android.
+                </p>
+                <div class="space-y-3">
+                  <div>
+                    <label for="cloudTokenInput" class="text-xs font-medium text-slate-300 block mb-1">GitHub Personal Access Token (gist scope):</label>
+                    <input id="cloudTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                  </div>
+                  <div>
+                    <label for="cloudGistIdInput" class="text-xs font-medium text-slate-300 block mb-1">Gist ID (leave blank to create a new Cloud Sync Gist):</label>
+                    <input id="cloudGistIdInput" type="text" placeholder="e.g. a1b2c3d4e5f6g7h8i9j0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+                  </div>
+                  <div class="flex flex-wrap gap-2 pt-1">
+                    <button id="cloudPushBtn" class="flex-1 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+                      ☁️⬆️ Push to Cloud
+                    </button>
+                    <button id="cloudPullBtn" class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">
+                      ☁️⬇️ Pull from Cloud
+                    </button>
+                  </div>
+                  <div id="cloudSyncStatusMsg" class="text-[11px] text-slate-400"></div>
+                </div>
+
+                <!-- Device Setup Guide -->
+                <div class="pt-3 border-t border-slate-800 space-y-2">
+                  <div class="text-xs font-semibold text-slate-300">How to run on all 3 devices:</div>
+                  <ul class="text-xs text-slate-400 space-y-1.5">
+                    <li>💻 <strong>PC & MacBook:</strong> Open in Chrome, Edge, or Safari and click <em>Install App</em> in the address bar for a standalone desktop window.</li>
+                    <li>📱 <strong>Android Phone:</strong> Open in Chrome for Android → tap <strong>⋮ Menu → Add to Home Screen</strong> for a full-screen mobile experience.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation Bar (Android Mobile & Tablet) -->
+  <nav id="mobileNav" class="lg:hidden fixed bottom-0 inset-x-0 z-40 backdrop-blur-xl bg-slate-950/90 border-t border-slate-800 px-2 py-2 flex items-center justify-around">
+    <button data-tab="dashboard" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-indigo-400 font-semibold text-[11px]">
+      <span class="text-lg">🏠</span>
+      <span>Home</span>
+    </button>
+    <button data-tab="study" class="nav-btn relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]">
+      <span class="text-lg">🧠</span>
+      <span>Cards</span>
+      <span id="dueCountBadgeMobile" class="absolute top-1 right-2 w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold flex items-center justify-center">5</span>
+    </button>
+    <button data-tab="practice" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]">
+      <span class="text-lg">💬</span>
+      <span>Practice</span>
+    </button>
+    <button data-tab="arcade" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]">
+      <span class="text-lg">⚡</span>
+      <span>Rush</span>
+    </button>
+    <button data-tab="discover" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]">
+      <span class="text-lg">🌐</span>
+      <span>Sources</span>
+    </button>
+    <button data-tab="sync" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]">
+      <span class="text-lg">🔄</span>
+      <span>Sync</span>
+    </button>
+  </nav>
+
+  <script>
+    
+    const VI_DICTIONARY = {
+      commute: {
+        viMeaning: 'Đi lại hàng ngày (giữa nhà và nơi làm việc/trường học)',
+        viExplain: 'Dùng riêng cho việc di chuyển đều đặn mỗi ngày đi làm hoặc đi học (vừa là động từ vừa là danh từ). Không dùng cho đi du lịch hay đi dạo.',
+        viExamples: [
+          'Chuyến đi làm buổi sáng của tôi mất khoảng 40 phút bằng tàu điện.',
+          'Hôm nay tôi làm việc tại nhà để tránh cảnh đi làm dưới trời mưa.'
+        ]
+      },
+      postpone: {
+        viMeaning: 'Hoãn lại, dời lịch sang thời điểm sau',
+        viExplain: 'Mang sắc thái lịch sự, chuyên nghiệp hơn cụm "put off". Rất hay dùng trong email công việc khi muốn dời cuộc họp hoặc deadline.',
+        viExamples: [
+          'Chúng ta có thể dời buổi họp 2 giờ chiều sang sáng mai được không?',
+          'Họ đã phải hoãn buổi hòa nhạc ngoài trời vì cơn bão.'
+        ]
+      },
+      overwhelmed: {
+        viMeaning: 'Quá tải, choáng ngợp (vì quá nhiều việc hoặc cảm xúc)',
+        viExplain: 'Cực kỳ thông dụng khi bạn muốn chia sẻ thật lòng là mình đang bị "ngợp" bởi khối lượng công việc, tin nhắn hoặc sự thay đổi lớn.',
+        viExamples: [
+          'Tuần này tôi thấy hơi quá tải với hàng loạt yêu cầu dự án mới.',
+          'Chuyển đến một thành phố mới rất thú vị nhưng lúc đầu dễ gây choáng ngợp.'
+        ]
+      },
+      spontaneous: {
+        viMeaning: 'Ngẫu hứng, tự phát (không lên kế hoạch trước)',
+        viExplain: 'Mang nghĩa tích cực, vui vẻ khi tả một chuyến đi chơi bất chợt, một quyết định ngẫu hứng hoặc tính cách phóng khoáng.',
+        viExamples: [
+          'Chúng tôi đã quyết định ngẫu hứng lái xe ra biển ngắm hoàng hôn.',
+          'Những kỷ niệm du lịch tuyệt vời nhất của tôi đến từ những chuyến rẽ ngang ngẫu hứng.'
+        ]
+      },
+      pragmatic: {
+        viMeaning: 'Thực tế, thực dụng (ưu tiên hiệu quả thực tiễn hơn lý thuyết)',
+        viExplain: 'Lời khen rất có sức nặng trong công việc: chỉ cách giải quyết vấn đề nhạy bén, sát với điều kiện thực tế thay vì lý thuyết suông.',
+        viExamples: [
+          'Hãy chọn cách tiếp cận thực tế và ra mắt tính năng cốt lõi trước.',
+          'Cô ấy rất thực tế trong việc lập ngân sách cho kế hoạch ra nước ngoài.'
+        ]
+      },
+      candid: {
+        viMeaning: 'Thẳng thắn, chân thật, cởi mở (không khách sáo)',
+        viExplain: 'Hay dùng để mở lời khi góp ý chân thành ("Can I be candid with you?") mà vẫn giữ được sự tôn trọng, ấm áp.',
+        viExamples: [
+          'Tôi rất trân trọng những góp ý thẳng thắn của bạn về bài thuyết trình.',
+          'Thú thật (thẳng thắn mà nói), năm ngoái tôi khá lo lắng trước khi chuyển ngành.'
+        ]
+      },
+      bottleneck: {
+        viMeaning: 'Điểm nghẽn, nút thắt cổ chai (gây chậm toàn bộ quy trình)',
+        viExplain: 'Hình ảnh cổ chai hẹp làm nước chảy chậm lại—dùng cho cả kẹt xe lẫn công đoạn đang làm tắc nghẽn tiến độ dự án.',
+        viExamples: [
+          'Khâu kiểm thử thủ công hiện là điểm nghẽn lớn nhất trước khi phát hành.',
+          'Cây cầu này tạo ra điểm nghẽn giao thông lớn vào mỗi 6 giờ chiều.'
+        ]
+      },
+      resilient: {
+        viMeaning: 'Kiên cường, có sức bật và khả năng phục hồi nhanh',
+        viExplain: 'Dùng cho cả con người (vượt qua thất bại nhanh chóng) lẫn hệ thống kỹ thuật (chịu lỗi tốt, tự phục hồi).',
+        viExamples: [
+          'Học ngoại ngữ giúp bạn kiên cường hơn khi lỡ nói sai trước đám đông.',
+          'Chúng tôi thiết kế hệ thống đồng bộ đám mây bền bỉ để không bao giờ mất dữ liệu.'
+        ]
+      },
+      ubiquitous: {
+        viMeaning: 'Phổ biến khắp mọi nơi, đâu đâu cũng thấy',
+        viExplain: 'Từ cấp độ C1 rất đắt giá để mô tả công nghệ, thói quen hoặc xu hướng xuất hiện dày đặc quanh ta hàng ngày.',
+        viExamples: [
+          'Thanh toán mã QR đã trở nên phổ biến khắp các quán cà phê và hàng quán.',
+          'Cà phê sữa đá hầu như xuất hiện trên mọi bàn làm việc buổi sáng.'
+        ]
+      },
+      serendipity: {
+        viMeaning: 'Cơ duyên tình cờ, sự may mắn bất ngờ thú vị',
+        viExplain: 'Tinh tế hơn từ "luck": diễn tả khoảnh khắc bạn vô tình tìm thấy một điều tuyệt vời khi đang đi tìm một thứ khác.',
+        viExamples: [
+          'Tìm thấy hiệu sách nhỏ ẩn mình bên bờ sông đúng là một cơ duyên tình cờ.',
+          'Chúng tôi tình cờ quen nhau trên chuyến bay bị trễ rồi cùng sáng lập dự án.'
+        ]
+      },
+      mitigate: {
+        viMeaning: 'Giảm thiểu, làm dịu bớt (rủi ro, thiệt hại, tác động xấu)',
+        viExplain: 'Động từ chuẩn mực trong giao tiếp công sở và IELTS khi nói về giải pháp phòng ngừa hoặc giảm nhẹ hậu quả ("mitigate risk").',
+        viExamples: [
+          'Lưu đệm ngoại tuyến giúp giảm thiểu tác động khi mạng di động chập chờn.',
+          'Đi bộ ngắn mỗi giờ giúp giảm thiểu tình trạng mỏi mắt do nhìn màn hình.'
+        ]
+      },
+      ephemeral: {
+        viMeaning: 'Phù du, chóng tàn, chỉ tồn tại trong chốc lát',
+        viExplain: 'Từ C2 giàu hình ảnh, dùng cho những thứ ngắn ngủi như Story 24h trên mạng xã hội, trào lưu nhất thời, hay ánh bình minh.',
+        viExamples: [
+          'Khác với bài blog lưu giữ lâu dài, các Story 24 giờ mang tính chất chóng tàn có chủ đích.',
+          'Ánh nắng vàng trên sông lúc bình minh đẹp một cách mong manh, thoáng qua.'
+        ]
+      },
+      scalable: {
+        viMeaning: 'Có khả năng mở rộng quy mô dễ dàng',
+        viExplain: 'Dùng cho sản phẩm, phần mềm hoặc mô hình làm việc có thể phục vụ lượng người dùng tăng gấp nhiều lần mà không bị quá tải.',
+        viExamples: [
+          'Chúng ta cần một quy trình có khả năng mở rộng tốt cho cả 10 lẫn 10.000 người dùng.'
+        ]
+      },
+      seamless: {
+        viMeaning: 'Mượt mà, liền mạch (không bị gián đoạn)',
+        viExplain: 'Rất hay dùng để khen trải nghiệm ứng dụng, đồng bộ đa thiết bị hoặc dịch vụ trơn tru.',
+        viExamples: [
+          'Đồng bộ đám mây giúp việc chuyển đổi giữa MacBook và điện thoại Android liền mạch.'
+        ]
+      },
+      articulate: {
+        viMeaning: 'Diễn đạt rõ ràng, lưu loát, mạch lạc',
+        viExplain: 'Tính từ chỉ người ăn nói sắc sảo; động từ chỉ việc diễn tả một suy nghĩ/cảm xúc phức tạp thành lời nói rõ ràng.',
+        viExamples: [
+          'Thật khó để diễn tả thành lời vì sao bộ phim đó lại làm tôi xúc động đến vậy.'
+        ]
+      },
+      itinerary: {
+        viMeaning: 'Lịch trình chuyến đi, hành trình chi tiết',
+        viExplain: 'Danh từ không thể thiếu khi đi du lịch hoặc công tác để nói về kế hoạch đi đâu, làm gì từng ngày.',
+        viExamples: [
+          'Hãy giữ lịch trình ngày thứ Bảy linh hoạt để mình thoải mái khám phá các quán cà phê địa phương.'
+        ]
+      },
+      compelling: {
+        viMeaning: 'Thuyết phục mạnh mẽ, hấp dẫn, lôi cuốn',
+        viExplain: 'Mạnh hơn "interesting" rất nhiều—dùng cho lý lẽ sắc bén ("compelling argument") hoặc câu chuyện cuốn hút.',
+        viExamples: [
+          'Cô ấy đã đưa ra lập luận đầy thuyết phục để ưu tiên ra mắt bản di động trước.'
+        ]
+      },
+      cognitive: {
+        viMeaning: 'Thuộc về nhận thức, tư duy của não bộ',
+        viExplain: 'Hay đi kèm trong cụm "cognitive load" (tải nhận thức) hoặc "cognitive bias" (thiên kiến nhận thức).',
+        viExamples: [
+          'Phương pháp lặp lại ngắt quãng giúp giảm tải nhận thức khi học từ vựng mới.'
+        ]
+      }
+    };
+
+    function getViDetails(item) {
+      const key = (item.word || '').toLowerCase();
+      const preset = VI_DICTIONARY[key];
+      return {
+        viMeaning: item.viMeaning || (preset && preset.viMeaning) || ('Nghĩa tiếng Việt: ' + item.meaning),
+        viExplain: item.viExplain || (preset && preset.viExplain) || ('Giải thích nhanh: Từ "' + item.word + '" thường dùng trong ngữ cảnh giao tiếp thực tế cấp độ ' + (item.level || 'B2') + '.'),
+        viExamples: item.viExamples || (preset && preset.viExamples) || []
+      };
+    }
+
+    const INITIAL_CORPUS = [
+      {
+        id: 'w_a2_1',
+        word: 'commute',
+        phonetic: '/kəˈmjuːt/',
+        pos: 'verb / noun',
+        level: 'A2',
+        topic: 'social',
+        source: 'Oxford 3000 Core Corpus',
+        meaning: 'To travel regularly between your home and your workplace or school.',
+        nuance: 'Native speakers use "commute" specifically for daily work/school travel—not for vacations or errands.',
+        collocations: ['morning commute', 'commute by train', 'a 30-minute commute'],
+        mnemonic: 'Think of "COM-MUTE": You put your podcast on MUTE while traveling together (COM) to work.',
+        examples: [
+          { context: 'Casual Chat', text: 'My morning commute takes about forty minutes on the metro.' },
+          { context: 'Work Slack', text: 'I am working from home today to skip the rainy commute.' }
+        ],
+        cloze: {
+          speakerA: 'How do you like your new apartment downtown?',
+          speakerB: 'I love it! Best of all, my daily ____ to the office is now just a 10-minute walk.',
+          options: ['commute', 'voyage', 'excursion', 'migration'],
+          answer: 'commute'
+        },
+        nuanceQuiz: {
+          situation: 'You are chatting with a coworker at coffee about getting to the office.',
+          natural: 'How was your commute this morning? Traffic looked heavy.',
+          unnatural: 'How was your expedition to the building this morning?',
+          why: '"Commute" is the exact everyday word for traveling to and from work.'
+        }
+      },
+      {
+        id: 'w_a2_2',
+        word: 'postpone',
+        phonetic: '/pəʊstˈpəʊn/',
+        pos: 'verb',
+        level: 'A2',
+        topic: 'work',
+        source: 'Cambridge Essential Corpus',
+        meaning: 'To delay an event or arrangement until a later time or date.',
+        nuance: 'More professional than "put off" in emails and meetings, though both are common.',
+        collocations: ['postpone a meeting', 'postpone until Friday', 'indefinitely postponed'],
+        mnemonic: 'POST (after) + PONE (put): put it after today!',
+        examples: [
+          { context: 'Work Email', text: 'Could we postpone our 2 PM sync until tomorrow morning?' },
+          { context: 'Daily Life', text: 'They had to postpone the outdoor concert because of the storm.' }
+        ],
+        cloze: {
+          speakerA: 'Are we still launching the feature this afternoon?',
+          speakerB: 'We found a small bug, so let us ____ the release until Thursday.',
+          options: ['postpone', 'extinguish', 'accelerate', 'inhabit'],
+          answer: 'postpone'
+        },
+        nuanceQuiz: {
+          situation: 'Writing a polite message to a client when you need to move a call to next week.',
+          natural: 'Would it be possible to postpone our check-in call to Tuesday?',
+          unnatural: 'Would it be possible to abandon our check-in call to Tuesday?',
+          why: '"Postpone" clearly communicates rescheduling to a later time without cancelling permanently.'
+        }
+      },
+      {
+        id: 'w_b1_1',
+        word: 'overwhelmed',
+        phonetic: '/ˌəʊvəˈwelmd/',
+        pos: 'adjective',
+        level: 'B1',
+        topic: 'mind',
+        source: 'COCA Spoken English Top 2500',
+        meaning: 'Feeling sudden strong emotion or having too many things to deal with at once.',
+        nuance: 'Extremely common in real life when talking honestly about workload, notifications, or big life changes.',
+        collocations: ['feel overwhelmed by', 'overwhelmed with messages', 'a bit overwhelmed'],
+        mnemonic: 'Picture a huge wave (WHELM) washing OVER your desk of tasks.',
+        examples: [
+          { context: '1-on-1 Meeting', text: 'I felt a bit overwhelmed by all the new project requests this week.' },
+          { context: 'Casual Chat', text: 'Moving to a new city is exciting, but it can feel overwhelming at first.' }
+        ],
+        cloze: {
+          speakerA: 'You have been staring at your inbox for twenty minutes—everything okay?',
+          speakerB: 'Yeah, I just came back from vacation and feel slightly ____ by 300 unread emails.',
+          options: ['overwhelmed', 'outdated', 'overlooked', 'overheard'],
+          answer: 'overwhelmed'
+        },
+        nuanceQuiz: {
+          situation: 'Telling your manager honestly that you have too many simultaneous tasks.',
+          natural: 'I am feeling a little overwhelmed with three deadlines on Friday—can we prioritize?',
+          unnatural: 'I am feeling conquered and defeated by three deadlines on Friday.',
+          why: '"Feeling a little overwhelmed" is natural, constructive, and widely understood at work.'
+        }
+      },
+      {
+        id: 'w_b1_2',
+        word: 'spontaneous',
+        phonetic: '/spɒnˈteɪniəs/',
+        pos: 'adjective',
+        level: 'B1',
+        topic: 'travel',
+        source: 'NGSL High-Utility Spoken List',
+        meaning: 'Happening or done in a natural, sudden way, without advance planning.',
+        nuance: 'Usually carries a positive, fun vibe when describing trips, plans, or lively conversations.',
+        collocations: ['a spontaneous trip', 'spontaneous applause', 'be more spontaneous'],
+        mnemonic: 'SPONGE-taneous: Quick as a squeeze of a sponge, no planning needed!',
+        examples: [
+          { context: 'Weekend Hangout', text: 'We made a spontaneous decision to drive to the beach for sunset.' },
+          { context: 'Travel Story', text: 'Some of my best travel memories came from spontaneous detours.' }
+        ],
+        cloze: {
+          speakerA: 'Did you plan this road trip weeks ago?',
+          speakerB: 'Not at all! It was totally ____—we packed our bags an hour before leaving.',
+          options: ['spontaneous', 'compulsory', 'tedious', 'deliberate'],
+          answer: 'spontaneous'
+        },
+        nuanceQuiz: {
+          situation: 'Describing a friend who loves unplanned weekend adventures.',
+          natural: 'She is super spontaneous—she will book a train ticket ten minutes before departure.',
+          unnatural: 'She is super accidental—she will book a train ticket ten minutes before departure.',
+          why: '"Spontaneous" praises someone for being lively and open to unplanned fun.'
+        }
+      },
+      {
+        id: 'w_b2_1',
+        word: 'pragmatic',
+        phonetic: '/præɡˈmætɪk/',
+        pos: 'adjective',
+        level: 'B2',
+        topic: 'work',
+        source: 'Economist & Tech Corpus',
+        meaning: 'Solving problems in a sensible, practical way that suits real conditions rather than fixed theories.',
+        nuance: 'A high-status compliment in workplace and everyday decision-making—signals someone who gets things done realistically.',
+        collocations: ['a pragmatic approach', 'take a pragmatic view', 'pragmatic solution'],
+        mnemonic: 'PRAG-matic = PRACTICAL automatic thinking.',
+        examples: [
+          { context: 'Product Sync', text: 'Let us take a pragmatic approach and ship the core feature first.' },
+          { context: 'Life Advice', text: 'She is very pragmatic about budgeting for her move abroad.' }
+        ],
+        cloze: {
+          speakerA: 'Should we rebuild the entire app from scratch before Friday?',
+          speakerB: 'We do not have time for perfection—we need a ____ fix that works for users today.',
+          options: ['pragmatic', 'theatrical', 'fragile', 'nostalgic'],
+          answer: 'pragmatic'
+        },
+        nuanceQuiz: {
+          situation: 'Praising a teammate who proposed a realistic compromise during a meeting.',
+          natural: 'Thanks for offering such a pragmatic solution to the timeline issue.',
+          unnatural: 'Thanks for offering such an ordinary solution to the timeline issue.',
+          why: '"Pragmatic" highlights smart, grounded realism rather than calling an idea plain.'
+        }
+      },
+      {
+        id: 'w_b2_2',
+        word: 'candid',
+        phonetic: '/ˈkændɪd/',
+        pos: 'adjective',
+        level: 'B2',
+        topic: 'social',
+        source: 'Contemporary Spoken Corpus',
+        meaning: 'Truthful and straightforward; saying what you genuinely think without hiding behind politeness.',
+        nuance: 'Often used to invite or preface honest feedback ("Can I be candid with you?") without sounding rude.',
+        collocations: ['candid feedback', 'a candid conversation', 'to be totally candid'],
+        mnemonic: 'CAN-DID: Honest about what you CAN and DID do (plus "candid camera" = unposed!).',
+        examples: [
+          { context: 'Team Retro', text: 'I really appreciate your candid feedback on my presentation slides.' },
+          { context: 'Coffee Chat', text: 'To be candid, I was nervous before switching careers last year.' }
+        ],
+        cloze: {
+          speakerA: 'Do you think our pitch deck is ready for the investors?',
+          speakerB: 'Can I be ____ with you? The financial slide is still a bit confusing.',
+          options: ['candid', 'opaque', 'timid', 'synthetic'],
+          answer: 'candid'
+        },
+        nuanceQuiz: {
+          situation: 'Asking a close colleague for their honest opinion on your draft.',
+          natural: 'Give me your candid thoughts—does the intro hook your attention?',
+          unnatural: 'Give me your harsh thoughts—does the intro hook your attention?',
+          why: '"Candid" invites refreshing honesty while keeping the tone respectful and warm.'
+        }
+      },
+      {
+        id: 'w_b2_3',
+        word: 'bottleneck',
+        phonetic: '/ˈbɒtlnek/',
+        pos: 'noun',
+        level: 'B2',
+        topic: 'work',
+        source: 'Modern Workplace & Tech Lexicon',
+        meaning: 'A point of congestion or delay that slows down an entire process or system.',
+        nuance: 'Used constantly in software, business, traffic, and daily productivity to pinpoint what is holding progress back.',
+        collocations: ['identify the bottleneck', 'remove a bottleneck', 'major bottleneck'],
+        mnemonic: 'Just like water pouring slowly through the narrow NECK of a BOTTLE.',
+        examples: [
+          { context: 'Engineering Standup', text: 'Manual QA testing is currently our biggest bottleneck before release.' },
+          { context: 'City Travel', text: 'The bridge creates a huge traffic bottleneck every evening at 6 PM.' }
+        ],
+        cloze: {
+          speakerA: 'Why is the customer onboarding taking five days instead of one?',
+          speakerB: 'Document verification is the main ____ right now—everything else is automated.',
+          options: ['bottleneck', 'breakthrough', 'milestone', 'shortcut'],
+          answer: 'bottleneck'
+        },
+        nuanceQuiz: {
+          situation: 'Explaining why a team project is waiting on legal approval.',
+          natural: 'Contract sign-off has become a bottleneck for Q4 launches.',
+          unnatural: 'Contract sign-off has become a corkscrew for Q4 launches.',
+          why: '"Bottleneck" is the universal metaphor for a single stage slowing down a workflow.'
+        }
+      },
+      {
+        id: 'w_b2_4',
+        word: 'resilient',
+        phonetic: '/rɪˈzɪliənt/',
+        pos: 'adjective',
+        level: 'B2',
+        topic: 'mind',
+        source: 'Psychology & Everyday Fluency Corpus',
+        meaning: 'Able to recover quickly from setbacks, toughness, or difficult changes.',
+        nuance: 'Applies to people, mindsets, economies, and even technical systems that bounce back smoothly.',
+        collocations: ['remarkably resilient', 'build a resilient mindset', 'resilient community'],
+        mnemonic: 'RE-SIL-ient = RE-SPRING-ient: springing back into shape after pressure.',
+        examples: [
+          { context: 'Personal Growth', text: 'Learning a language makes you more resilient when you make mistakes in public.' },
+          { context: 'Tech Architecture', text: 'We designed a resilient cloud sync so offline changes never get lost.' }
+        ],
+        cloze: {
+          speakerA: 'How did she handle her startup pivoting twice in one year?',
+          speakerB: 'She stayed super ____ and turned the feedback into a much stronger product.',
+          options: ['resilient', 'redundant', 'reluctant', 'reckless'],
+          answer: 'resilient'
+        },
+        nuanceQuiz: {
+          situation: 'Encouraging a friend who bounced back after a tough job interview.',
+          natural: 'You are so resilient—you already learned from it and booked two more interviews!',
+          unnatural: 'You are so rigid—you already learned from it and booked two more interviews!',
+          why: '"Resilient" celebrates adaptability and bouncing back stronger.'
+        }
+      },
+      {
+        id: 'w_c1_1',
+        word: 'ubiquitous',
+        phonetic: '/juːˈbɪkwɪtəs/',
+        pos: 'adjective',
+        level: 'C1',
+        topic: 'work',
+        source: 'Academic & Cultural Commentary Corpus',
+        meaning: 'Seeming to be everywhere at the same time; extremely widespread in everyday life.',
+        nuance: 'Great for describing trends, technologies, or cultural habits that have become impossible to miss.',
+        collocations: ['ubiquitous smartphones', 'become ubiquitous', 'ubiquitous presence'],
+        mnemonic: 'U-BI-QUITOUS: "You be quit-us? Impossible, QR codes are EVERYWHERE!"',
+        examples: [
+          { context: 'Tech Culture', text: 'QR code payments have become ubiquitous across cafes and street stalls.' },
+          { context: 'Conversation', text: 'Iced coffee is practically ubiquitous on morning desks here.' }
+        ],
+        cloze: {
+          speakerA: 'Do small shops take digital wallet transfers now?',
+          speakerB: 'Totally—cashless QR codes have become ____ over the last three years.',
+          options: ['ubiquitous', 'scarce', 'obsolete', 'clandestine'],
+          answer: 'ubiquitous'
+        },
+        nuanceQuiz: {
+          situation: 'Commenting on how AI assistants now appear inside every app.',
+          natural: 'AI summaries have become ubiquitous in productivity tools this year.',
+          unnatural: 'AI summaries have become contagious in productivity tools this year.',
+          why: '"Ubiquitous" captures being present everywhere without implying a disease.'
+        }
+      },
+      {
+        id: 'w_c1_2',
+        word: 'serendipity',
+        phonetic: '/ˌserənˈdɪpəti/',
+        pos: 'noun',
+        level: 'C1',
+        topic: 'travel',
+        source: 'Literary & Fluent Conversation Corpus',
+        meaning: 'The occurrence of finding valuable, delightful, or agreeable things purely by happy chance.',
+        nuance: 'More poetic and specific than "luck"—it describes stumbling upon something wonderful while looking for something else.',
+        collocations: ['pure serendipity', 'a moment of serendipity', 'serendipitous encounter'],
+        mnemonic: 'SERENE + DIP: Taking a serene dip in the ocean and accidentally finding a pearl!',
+        examples: [
+          { context: 'Travel Story', text: 'Finding that hidden riverside bookshop was pure serendipity.' },
+          { context: 'Networking', text: 'We met by serendipity on a delayed flight and ended up co-founding a project.' }
+        ],
+        cloze: {
+          speakerA: 'How did you discover this amazing pho place down the alley?',
+          speakerB: 'Pure ____! We took a wrong turn looking for the pharmacy and smelled the broth.',
+          options: ['serendipity', 'monotony', 'bureaucracy', 'futility'],
+          answer: 'serendipity'
+        },
+        nuanceQuiz: {
+          situation: 'Describing bumping into your old university mentor at an airport cafe.',
+          natural: 'It was a wonderful bit of serendipity running into my mentor in Singapore.',
+          unnatural: 'It was a wonderful bit of calculation running into my mentor in Singapore.',
+          why: '"Serendipity" celebrates a happy, unplanned coincidence.'
+        }
+      },
+      {
+        id: 'w_c1_3',
+        word: 'mitigate',
+        phonetic: '/ˈmɪtɪɡeɪt/',
+        pos: 'verb',
+        level: 'C1',
+        topic: 'work',
+        source: 'Executive & Strategy Corpus',
+        meaning: 'To make something harmful, unpleasant, or risky less severe or painful.',
+        nuance: 'Essential in professional English when discussing risks, delays, or side effects ("mitigate risk").',
+        collocations: ['mitigate the risk', 'mitigate the impact', 'steps to mitigate'],
+        mnemonic: 'MITT-igate: Wearing a thick oven MITT makes the heat less painful!',
+        examples: [
+          { context: 'Project Planning', text: 'Offline caching helps mitigate the impact of spotty mobile Wi-Fi.' },
+          { context: 'Health & Lifestyle', text: 'Taking short walks every hour helps mitigate eye strain from screens.' }
+        ],
+        cloze: {
+          speakerA: 'What if the external API is slow when the user is on the train?',
+          speakerB: 'We can ____ that risk by caching the vocabulary pack locally on their phone.',
+          options: ['mitigate', 'aggravate', 'fabricate', 'instigate'],
+          answer: 'mitigate'
+        },
+        nuanceQuiz: {
+          situation: 'Explaining how your backup plan reduces potential downtime.',
+          natural: 'Having a secondary server will mitigate the risk of an outage.',
+          unnatural: 'Having a secondary server will decorate the risk of an outage.',
+          why: '"Mitigate the risk" is the standard professional collocation in English.'
+        }
+      },
+      {
+        id: 'w_c2_1',
+        word: 'ephemeral',
+        phonetic: '/ɪˈfemərəl/',
+        pos: 'adjective',
+        level: 'C2',
+        topic: 'mind',
+        source: 'Advanced Rhetoric & Cultural Corpus',
+        meaning: 'Lasting for only a very short time; fleeting and transitory.',
+        nuance: 'Used for disappearing social media stories, cherry blossoms, or brief emotional moments.',
+        collocations: ['ephemeral nature', 'ephemeral trends', 'ephemeral beauty'],
+        mnemonic: 'E-FEM-eral: Think of a shooting star that fades in a FEMtosecond.',
+        examples: [
+          { context: 'Digital Culture', text: 'Unlike permanent blog posts, 24-hour stories are intentionally ephemeral.' },
+          { context: 'Travel Reflection', text: 'The golden light over the river at dawn is breathtakingly ephemeral.' }
+        ],
+        cloze: {
+          speakerA: 'Why do people share more candid photos on 24-hour stories than on their main profile?',
+          speakerB: 'Because the ____ format takes away the pressure of perfection.',
+          options: ['ephemeral', 'perpetual', 'cumbersome', 'mandatory'],
+          answer: 'ephemeral'
+        },
+        nuanceQuiz: {
+          situation: 'Discussing viral internet memes that everyone forgets after three days.',
+          natural: 'Internet fame is often ephemeral—new trends replace old ones overnight.',
+          unnatural: 'Internet fame is often immortal—new trends replace old ones overnight.',
+          why: '"Ephemeral" precisely expresses how quickly modern trends vanish.'
+        }
+      }
+    ];
+
+    const PLACEMENT_QUESTIONS = [
+      {
+        level: 'A2',
+        scoreValue: 1150,
+        question: 'In a work message: "Could we ____ our 3 PM meeting until tomorrow morning?"',
+        options: ['postpone', 'borrow', 'descend', 'compete'],
+        answer: 'postpone'
+      },
+      {
+        level: 'B1',
+        scoreValue: 1300,
+        question: 'At a coffee shop: "We didn\'t plan the trip at all—it was completely ____!"',
+        options: ['spontaneous', 'artificial', 'reluctant', 'strict'],
+        answer: 'spontaneous'
+      },
+      {
+        level: 'B2',
+        scoreValue: 1450,
+        question: 'In a product meeting: "We need a ____ solution that actually works for customers today, not just in theory."',
+        options: ['pragmatic', 'nostalgic', 'ambiguous', 'fragile'],
+        answer: 'pragmatic'
+      },
+      {
+        level: 'C1',
+        scoreValue: 1620,
+        question: 'In risk planning: "Local offline storage helps ____ the impact of unstable mobile networks."',
+        options: ['mitigate', 'exacerbate', 'speculate', 'proliferate'],
+        answer: 'mitigate'
+      },
+      {
+        level: 'C2',
+        scoreValue: 1780,
+        question: 'Cultural discussion: "Viral social media trends are famously ____, vanishing within days."',
+        options: ['ephemeral', 'ubiquitous', 'perpetual', 'fastidious'],
+        answer: 'ephemeral'
+      }
+    ];
+
+    const LEVEL_META = {
+      A2: { title: 'Essential Everyday', minElo: 1000, next: 'B1 (1250)' },
+      B1: { title: 'Practical Intermediate', minElo: 1250, next: 'B2 (1400)' },
+      B2: { title: 'Upper-Intermediate', minElo: 1400, next: 'C1 (1600)' },
+      C1: { title: 'Advanced Fluency', minElo: 1600, next: 'C2 (1750)' },
+      C2: { title: 'Mastery & Nuance', minElo: 1750, next: 'Max Tier' }
+    };
+
+    const STORAGE_KEY = 'lexiflow_app_state_v1';
+
+    let state = {
+      level: 'B2',
+      elo: 1450,
+      xp: 120,
+      dailyXp: 20,
+      streak: 3,
+      soundEnabled: true,
+      viEnabled: true,
+      darkMode: true,
+      activeTab: 'dashboard',
+      topicFilter: 'all',
+      practiceMode: 'dialogue',
+      words: [],
+      srsIndex: 0,
+      srsFlipped: false,
+      clozeIndex: 0,
+      sentenceIndex: 0,
+      nuanceIndex: 0,
+      cloudGistId: '',
+      lastSyncedAt: 'Just now'
+    };
+
+    function initDefaultWords() {
+      const now = Date.now();
+      return INITIAL_CORPUS.map((item, idx) => ({
+        ...item,
+        interval: idx < 4 ? 0 : 1,
+        repetition: idx < 4 ? 0 : 1,
+        efactor: 2.5,
+        mastery: idx < 3 ? 25 : 40,
+        dueAt: now - (idx * 60000),
+        timesReviewed: idx < 3 ? 1 : 2
+      }));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed };
+          if (!Array.isArray(state.words) || state.words.length === 0) {
+            state.words = initDefaultWords();
+          }
+        } else {
+          state.words = initDefaultWords();
+        }
+      } catch (e) {
+        state.words = initDefaultWords();
+      }
+    }
+
+    function saveState() {
+      state.lastSyncedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+      updateSyncTokenField();
+      const indicator = document.getElementById('lastSyncIndicator');
+      if (indicator) indicator.textContent = '● Saved ' + state.lastSyncedAt;
+    }
+
+    let audioCtx = null;
+
+    function playTone(type) {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.08);
+          osc.frequency.setValueAtTime(783.99, now + 0.16);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'levelup') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.1);
+          osc.frequency.setValueAtTime(659.25, now + 0.2);
+          osc.frequency.setValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+          osc.start(now);
+          osc.stop(now + 0.55);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.setValueAtTime(175, now + 0.12);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.start(now);
+          osc.stop(now + 0.28);
+        } else {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        }
+      } catch (err) {}
+    }
+
+    function speakWord(text) {
+      playTone('click');
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'en-US';
+          utter.rate = 0.94;
+          window.speechSynthesis.speak(utter);
+          showToast('🔊 Pronouncing "' + text + '"', 'indigo');
+          return;
+        }
+      } catch (e) {}
+      showToast('🔊 Audio synthesized for "' + text + '"', 'indigo');
+    }
+
+    function showToast(message, color = 'indigo') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const el = document.createElement('div');
+      const borderMap = {
+        indigo: 'border-indigo-500/50 bg-slate-900/95 text-indigo-200',
+        emerald: 'border-emerald-500/50 bg-slate-900/95 text-emerald-200',
+        amber: 'border-amber-500/50 bg-slate-900/95 text-amber-200',
+        rose: 'border-rose-500/50 bg-slate-900/95 text-rose-200'
+      };
+      el.className = 'px-4 py-3 rounded-2xl border shadow-xl text-xs font-semibold flex items-center justify-between gap-3 transition-all duration-300 ' + (borderMap[color] || borderMap.indigo);
+      el.innerHTML = '<span>' + message + '</span>';
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-8px)';
+        setTimeout(() => el.remove(), 250);
+      }, 2800);
+    }
+
+    function awardXp(amount, deltaElo = 8) {
+      state.xp += amount;
+      state.dailyXp = Math.min(200, (state.dailyXp || 0) + amount);
+      state.elo = Math.max(1000, Math.min(1950, state.elo + deltaElo));
+
+      const oldLevel = state.level;
+      let newLevel = state.level;
+      if (state.elo >= 1750) newLevel = 'C2';
+      else if (state.elo >= 1600) newLevel = 'C1';
+      else if (state.elo >= 1400) newLevel = 'B2';
+      else if (state.elo >= 1250) newLevel = 'B1';
+      else newLevel = 'A2';
+
+      if (newLevel !== oldLevel && deltaElo > 0) {
+        state.level = newLevel;
+        playTone('levelup');
+        showToast('🎉 Level Up! Your adaptive level advanced to ' + newLevel + ' (' + LEVEL_META[newLevel].title + ')!', 'emerald');
+      }
+      saveState();
+      renderGlobalStats();
+    }
+
+    function getDueWords() {
+      const now = Date.now();
+      const levelWords = state.words.filter(w => w.level === state.level || w.mastery < 80);
+      const due = levelWords.filter(w => (w.dueAt || 0) <= now);
+      return due.length > 0 ? due : state.words.slice(0, 6);
+    }
+
+    function renderGlobalStats() {
+      const meta = LEVEL_META[state.level] || LEVEL_META.B2;
+      document.getElementById('sidebarLevelBadge').textContent = state.level;
+      document.getElementById('mobileLevelPill').textContent = state.level;
+      document.getElementById('sidebarLevelTitle').textContent = meta.title;
+      document.getElementById('sidebarEloText').textContent = 'Adaptive Score: ' + state.elo;
+      document.getElementById('sidebarNextTierText').textContent = 'Next: ' + meta.next;
+      document.getElementById('heroAdaptiveNote').textContent = 'Adaptive Engine Active • Tailored to CEFR ' + state.level;
+
+      const pct = Math.min(100, Math.max(8, Math.round(((state.elo - 1000) / 850) * 100)));
+      document.getElementById('sidebarLevelProgress').style.width = pct + '%';
+
+      document.getElementById('streakStat').textContent = state.streak;
+      document.getElementById('xpStat').textContent = state.xp;
+      const masteredCount = state.words.filter(w => (w.mastery || 0) >= 80).length;
+      document.getElementById('masteredStat').textContent = masteredCount;
+
+      const dueCount = getDueWords().length;
+      document.getElementById('dueCountBadgeDesktop').textContent = dueCount;
+      document.getElementById('dueCountBadgeMobile').textContent = dueCount;
+      document.getElementById('heroDueCount').textContent = dueCount;
+
+      const goalPct = Math.min(100, Math.round(((state.dailyXp || 0) / 50) * 100));
+      document.getElementById('dailyGoalBadge').textContent = (state.dailyXp || 0) + ' / 50 XP';
+      document.getElementById('dailyGoalBar').style.width = goalPct + '%';
+      document.getElementById('dashTotalWords').textContent = state.words.length;
+
+      document.querySelectorAll('.level-pill').forEach(btn => {
+        const lvl = btn.getAttribute('data-level');
+        if (lvl === state.level) {
+          btn.className = 'level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-indigo-500 bg-indigo-500/20 text-indigo-300 transition';
+        } else {
+          btn.className = 'level-pill px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:border-indigo-500 transition';
+        }
+      });
+    }
+
+    function renderDashboard() {
+      renderGlobalStats();
+      const grid = document.getElementById('dashboardWordGrid');
+      if (!grid) return;
+
+      const filtered = state.words.filter(w => {
+        const levelMatch = w.level === state.level;
+        const topicMatch = state.topicFilter === 'all' || w.topic === state.topicFilter;
+        return levelMatch && topicMatch;
+      });
+
+      const listToShow = filtered.length > 0
+        ? filtered
+        : state.words.filter(w => state.topicFilter === 'all' || w.topic === state.topicFilter);
+
+      document.getElementById('filteredWordCount').textContent = 'Showing ' + listToShow.length + ' words (' + state.level + ' prioritized)';
+
+      grid.innerHTML = listToShow.map(item => {
+        const mastery = item.mastery || 25;
+        const badgeColor = mastery >= 80
+          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+          : mastery >= 50
+            ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+            : 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+
+        const collocationsHtml = (item.collocations || []).map(c =>
+          `<span class="px-2 py-0.5 rounded-lg bg-slate-800/90 text-[11px] text-slate-300 border border-slate-700/70">${c}</span>`
+        ).join('');
+
+        const firstExample = (item.examples && item.examples[0])
+          ? item.examples[0]
+          : { context: 'Real Life', text: 'Used frequently in natural conversation.' };
+
+        return `
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-indigo-500/40 transition flex flex-col justify-between gap-4">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-display font-extrabold text-xl text-white">${item.word}</h4>
+                    <span class="text-xs text-slate-400 font-mono">${item.phonetic || ''}</span>
+                    <button data-speak="${item.word}" class="speak-btn w-7 h-7 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 flex items-center justify-center text-xs transition" title="Listen to pronunciation">
+                      🔊
+                    </button>
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">${item.pos || 'vocabulary'} • Source: <span class="text-slate-300">${item.source || 'External Corpus'}</span></div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-800 text-indigo-300">${item.level}</span>
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColor}">${mastery}%</span>
+                </div>
+              </div>
+
+              <p class="text-sm text-slate-200 mt-3 leading-relaxed">${item.meaning}</p>
+
+              ${state.viEnabled ? `
+                <div class="mt-2.5 p-3 rounded-xl bg-emerald-950/35 border border-emerald-500/30 space-y-1">
+                  <div class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                    <span>🇻🇳</span>
+                    <span>${getViDetails(item).viMeaning}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">${getViDetails(item).viExplain}</p>
+                </div>
+              ` : ''}
+
+              <div class="mt-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 text-xs space-y-1">
+                <div class="font-semibold text-indigo-300">💬 ${firstExample.context}:</div>
+                <div class="text-slate-200 italic">"${firstExample.text}"</div>
+                ${state.viEnabled && getViDetails(item).viExamples[0] ? `<div class="text-[11px] text-emerald-300/90 pt-0.5">→ ${getViDetails(item).viExamples[0]}</div>` : ''}
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                ${collocationsHtml}
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-[11px] text-slate-400">💡 ${item.mnemonic ? item.mnemonic.slice(0, 48) + '...' : 'Active recall ready'}</span>
+              <button data-studyword="${item.id}" class="study-word-btn text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                Practice Card →
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.speak-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          speakWord(btn.getAttribute('data-speak'));
+        });
+      });
+
+      grid.querySelectorAll('.study-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const wordId = btn.getAttribute('data-studyword');
+          const idx = state.words.findIndex(w => w.id === wordId);
+          if (idx !== -1) state.srsIndex = idx;
+          state.srsFlipped = false;
+          switchTab('study');
+        });
+      });
+    }
+
+    function renderSrsCard() {
+      const wrapper = document.getElementById('srsCardWrapper');
+      if (!wrapper || state.words.length === 0) return;
+
+      if (state.srsIndex >= state.words.length) state.srsIndex = 0;
+      const item = state.words[state.srsIndex];
+
+      document.getElementById('srsQueueCounter').textContent = `Card ${state.srsIndex + 1} of ${state.words.length} • Level ${item.level}`;
+
+      const viInfo = getViDetails(item);
+      const examplesHtml = (item.examples || []).map((ex, idx) => `
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">${ex.context}</span>
+          <p class="text-sm text-slate-200">"${ex.text}"</p>
+          ${state.viEnabled && viInfo.viExamples[idx] ? `<p class="text-xs text-emerald-300/90">🇻🇳 ${viInfo.viExamples[idx]}</p>` : ''}
+        </div>
+      `).join('');
+
+      const collocationsHtml = (item.collocations || []).map(c =>
+        `<span class="px-2.5 py-1 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-xs font-medium text-indigo-200">${c}</span>`
+      ).join('');
+
+      if (!state.srsFlipped) {
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              CEFR ${item.level} • ${item.pos || 'word'}
+            </span>
+            <span class="text-xs text-slate-400">Mastery: <strong class="text-emerald-400">${item.mastery || 25}%</strong></span>
+          </div>
+
+          <div class="my-auto py-8 text-center space-y-4">
+            <div class="inline-flex items-center gap-3">
+              <h3 class="font-display font-extrabold text-4xl sm:text-5xl text-white tracking-tight">${item.word}</h3>
+              <button id="srsSpeakFrontBtn" class="w-10 h-10 rounded-2xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 flex items-center justify-center text-lg transition" title="Pronounce">
+                🔊
+              </button>
+            </div>
+            <div class="text-sm text-slate-400 font-mono">${item.phonetic || ''}</div>
+
+            <div class="max-w-lg mx-auto mt-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-left space-y-2">
+              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Real-Life Context Clue:</div>
+              <p class="text-sm text-slate-200 italic">"${(item.examples && item.examples[0]) ? item.examples[0].text : item.meaning}"</p>
+              ${state.viEnabled ? `
+                <div class="pt-2 border-t border-slate-800 text-xs text-emerald-300 flex items-center justify-between">
+                  <span>🇻🇳 <strong>Gợi ý nhanh:</strong> ${viInfo.viMeaning}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span class="text-xs text-slate-400">Recall how you would use <strong>${item.word}</strong> in a sentence, then reveal.</span>
+            <button id="srsRevealBtn" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 transition">
+              👀 Reveal Meaning & Real-Life Usage
+            </button>
+          </div>
+        `;
+
+        document.getElementById('srsSpeakFrontBtn').addEventListener('click', () => speakWord(item.word));
+        document.getElementById('srsRevealBtn').addEventListener('click', () => {
+          playTone('click');
+          state.srsFlipped = true;
+          renderSrsCard();
+        });
+      } else {
+        wrapper.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-white">${item.word}</h3>
+              <span class="text-xs text-slate-400 font-mono">${item.phonetic || ''}</span>
+              <button id="srsSpeakBackBtn" class="px-2.5 py-1 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-semibold transition">
+                🔊 Listen
+              </button>
+            </div>
+            <span class="text-xs text-slate-400">Source: ${item.source || 'External Corpus'}</span>
+          </div>
+
+          <div class="py-5 space-y-4">
+            <div class="space-y-2.5">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wider text-indigo-400">Core Meaning & Real-World Nuance</div>
+                <p class="text-base font-medium text-white mt-1">${item.meaning}</p>
+                <p class="text-xs text-slate-300 mt-1">${item.nuance || ''}</p>
+              </div>
+              ${state.viEnabled ? `
+                <div class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/35 space-y-1">
+                  <div class="text-sm font-bold text-emerald-300">🇻🇳 ${viInfo.viMeaning}</div>
+                  <p class="text-xs text-slate-200 leading-relaxed"><strong>Cách dùng thực tế:</strong> ${viInfo.viExplain}</p>
+                </div>
+              ` : ''}
+            </div>
+
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">Natural Collocations (Chunking Memory)</div>
+              <div class="flex flex-wrap gap-2">${collocationsHtml}</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${examplesHtml}
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
+              <strong>🧠 Memory Hook (Mnemonic):</strong> ${item.mnemonic || 'Connect this word to a personal experience today.'}
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800">
+            <div class="text-xs text-center text-slate-400 mb-3">How well did you know how to use <strong>${item.word}</strong>? (Updates SM-2 interval & adaptive level)</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <button data-quality="1" class="srs-rate-btn p-3 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-center transition">
+                <div class="font-bold text-xs text-rose-300">Again</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">&lt; 1 min • Reset</div>
+              </button>
+              <button data-quality="3" class="srs-rate-btn p-3 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-center transition">
+                <div class="font-bold text-xs text-amber-300">Hard</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">1 day • +8 XP</div>
+              </button>
+              <button data-quality="4" class="srs-rate-btn p-3 rounded-2xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-center transition">
+                <div class="font-bold text-xs text-indigo-300">Good</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">3 days • +15 XP</div>
+              </button>
+              <button data-quality="5" class="srs-rate-btn p-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-center transition">
+                <div class="font-bold text-xs text-emerald-300">Easy</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">7 days • +25 XP</div>
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('srsSpeakBackBtn').addEventListener('click', () => speakWord(item.word));
+        wrapper.querySelectorAll('.srs-rate-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const q = parseInt(btn.getAttribute('data-quality'), 10);
+            applySm2Rating(item, q);
+          });
+        });
+      }
+    }
+
+    function applySm2Rating(item, quality) {
+      let rep = item.repetition || 0;
+      let interval = item.interval || 1;
+      let ef = item.efactor || 2.5;
+
+      if (quality < 3) {
+        rep = 0;
+        interval = 0;
+        item.mastery = Math.max(10, (item.mastery || 25) - 15);
+        playTone('error');
+        awardXp(5, -6);
+        showToast('Scheduled "' + item.word + '" for immediate reinforcement.', 'amber');
+      } else {
+        if (rep === 0) interval = 1;
+        else if (rep === 1) interval = 3;
+        else interval = Math.round(interval * ef);
+        rep += 1;
+
+        ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+        if (ef < 1.3) ef = 1.3;
+
+        const gain = quality === 5 ? 30 : quality === 4 ? 20 : 12;
+        item.mastery = Math.min(100, (item.mastery || 25) + gain);
+        const xpReward = quality === 5 ? 25 : quality === 4 ? 15 : 8;
+        const eloDelta = quality === 5 ? 18 : quality === 4 ? 10 : 4;
+        playTone('success');
+        awardXp(xpReward, eloDelta);
+        showToast('+' + xpReward + ' XP! "' + item.word + '" scheduled in ' + interval + ' day(s).', 'emerald');
+      }
+
+      item.repetition = rep;
+      item.interval = interval;
+      item.efactor = ef;
+      item.dueAt = Date.now() + interval * 86400000;
+      item.timesReviewed = (item.timesReviewed || 0) + 1;
+
+      state.srsFlipped = false;
+      state.srsIndex = (state.srsIndex + 1) % state.words.length;
+      saveState();
+      renderSrsCard();
+    }
+
+    function renderPracticeLab() {
+      document.querySelectorAll('.pmode-btn').forEach(btn => {
+        const mode = btn.getAttribute('data-pmode');
+        if (mode === state.practiceMode) {
+          btn.className = 'pmode-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+        } else {
+          btn.className = 'pmode-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition';
+        }
+      });
+
+      document.getElementById('practice-dialogue').classList.toggle('hidden', state.practiceMode !== 'dialogue');
+      document.getElementById('practice-sentence').classList.toggle('hidden', state.practiceMode !== 'sentence');
+      document.getElementById('practice-nuance').classList.toggle('hidden', state.practiceMode !== 'nuance');
+
+      if (state.practiceMode === 'dialogue') renderDialogueCloze();
+      else if (state.practiceMode === 'sentence') renderSentenceBuilder();
+      else renderNuanceSpotter();
+    }
+
+    function renderDialogueCloze() {
+      const container = document.getElementById('practice-dialogue');
+      const pool = state.words.filter(w => w.cloze);
+      if (pool.length === 0) return;
+      const item = pool[state.clozeIndex % pool.length];
+
+      const optionsHtml = item.cloze.options.map(opt => `
+        <button data-opt="${opt}" class="cloze-opt-btn p-3.5 rounded-2xl bg-slate-900 hover:bg-indigo-950/80 border border-slate-700 hover:border-indigo-500 text-sm font-semibold text-white transition text-left flex items-center justify-between">
+          <span>${opt}</span>
+          <span class="text-xs text-slate-500">Select</span>
+        </button>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300">
+            Real-World Dialogue Completion • CEFR ${item.level}
+          </span>
+          <span class="text-xs text-slate-400">Scenario ${(state.clozeIndex % pool.length) + 1} of ${pool.length}</span>
+        </div>
+
+        <div class="space-y-3 my-4">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold shrink-0">A</div>
+            <div class="p-4 rounded-2xl rounded-tl-none bg-slate-900 border border-slate-800 text-sm text-slate-200">
+              "${item.cloze.speakerA}"
+            </div>
+          </div>
+          <div class="flex items-start gap-3 justify-end">
+            <div class="p-4 rounded-2xl rounded-tr-none bg-indigo-950/60 border border-indigo-500/30 text-sm text-white max-w-xl">
+              "${item.cloze.speakerB.replace('____', '<span id="clozeBlankSlot" class="px-2.5 py-0.5 rounded-lg bg-indigo-500/30 border border-indigo-400 font-bold text-indigo-200">____</span>')}"
+            </div>
+            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">You</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${optionsHtml}
+        </div>
+
+        <div id="clozeFeedbackBox" class="hidden p-4 rounded-2xl border text-xs space-y-2"></div>
+      `;
+
+      container.querySelectorAll('.cloze-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const picked = btn.getAttribute('data-opt');
+          const fb = document.getElementById('clozeFeedbackBox');
+          const slot = document.getElementById('clozeBlankSlot');
+          if (slot) slot.textContent = picked;
+
+          if (picked.toLowerCase() === item.cloze.answer.toLowerCase()) {
+            playTone('success');
+            awardXp(20, 12);
+            item.mastery = Math.min(100, (item.mastery || 30) + 15);
+            saveState();
+            fb.className = 'p-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-xs space-y-2';
+            fb.innerHTML = `
+              <div class="font-bold text-sm">✓ Spot on! +20 XP</div>
+              <p><strong>${item.word}</strong> (${item.phonetic}) fits naturally here: ${item.nuance}</p>
+              ${state.viEnabled ? `<p class="text-emerald-300">🇻🇳 <strong>${getViDetails(item).viMeaning}:</strong> ${getViDetails(item).viExplain}</p>` : ''}
+              <button id="nextClozeBtn" class="mt-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">
+                Next Conversation →
+              </button>
+            `;
+            fb.classList.remove('hidden');
+            document.getElementById('nextClozeBtn').addEventListener('click', () => {
+              state.clozeIndex += 1;
+              renderDialogueCloze();
+            });
+          } else {
+            playTone('error');
+            fb.className = 'p-4 rounded-2xl border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs space-y-1';
+            fb.innerHTML = `
+              <div class="font-bold">Not quite natural in this context.</div>
+              <p>Hint: We need a word that means <em>"${item.meaning}"</em> ${state.viEnabled ? `(🇻🇳 <strong>${getViDetails(item).viMeaning}</strong>)` : ''}.</p>
+            `;
+            fb.classList.remove('hidden');
+          }
+        });
+      });
+    }
+
+    function renderSentenceBuilder() {
+      const container = document.getElementById('practice-sentence');
+      const item = state.words[state.sentenceIndex % state.words.length];
+      const collocationChips = (item.collocations || []).map(c =>
+        `<button type="button" data-insert="${c}" class="insert-colloc-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-500/30 text-xs text-indigo-300 border border-slate-700 transition">+ "${c}"</button>`
+      ).join('');
+
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300">
+              Active Production Lab • CEFR ${item.level}
+            </span>
+            <h3 class="font-display font-bold text-xl mt-2">Write a real-life sentence using: <span class="text-indigo-400">${item.word}</span></h3>
+          </div>
+          <button id="skipSentenceWordBtn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300">
+            Try Another Word →
+          </button>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+          <div class="text-xs text-slate-300"><strong>Meaning:</strong> ${item.meaning}</div>
+          ${state.viEnabled ? `<div class="text-xs text-emerald-300">🇻🇳 <strong>Nghĩa & Cách dùng:</strong> ${getViDetails(item).viMeaning} — ${getViDetails(item).viExplain}</div>` : ''}
+          <div class="text-xs text-slate-400"><strong>Click a natural collocation to insert:</strong></div>
+          <div class="flex flex-wrap gap-2 pt-1">${collocationChips}</div>
+        </div>
+
+        <div class="space-y-3">
+          <textarea id="userSentenceInput" rows="3" placeholder="Write a sentence about your work, studies, or daily life using '${item.word}'..." class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"></textarea>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Checks target word usage, collocations, and sentence length.</span>
+            <button id="checkSentenceBtn" class="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/20 transition">
+              ✨ Evaluate My Sentence
+            </button>
+          </div>
+        </div>
+
+        <div id="sentenceEvalResult" class="hidden p-4 rounded-2xl border text-xs space-y-2"></div>
+      `;
+
+      document.getElementById('skipSentenceWordBtn').addEventListener('click', () => {
+        state.sentenceIndex += 1;
+        renderSentenceBuilder();
+      });
+
+      container.querySelectorAll('.insert-colloc-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById('userSentenceInput');
+          const phrase = btn.getAttribute('data-insert');
+          input.value = (input.value ? input.value.trim() + ' ' : '') + phrase + ' ';
+          input.focus();
+        });
+      });
+
+      document.getElementById('checkSentenceBtn').addEventListener('click', () => {
+        const text = (document.getElementById('userSentenceInput').value || '').trim();
+        const resBox = document.getElementById('sentenceEvalResult');
+        const rootStem = item.word.toLowerCase().slice(0, Math.max(4, item.word.length - 2));
+        const hasWord = text.toLowerCase().includes(rootStem);
+        const wordCount = text.split(/\s+/).filter(Boolean).length;
+        const usedColloc = (item.collocations || []).find(c => text.toLowerCase().includes(c.toLowerCase()));
+
+        if (!hasWord) {
+          playTone('error');
+          resBox.className = 'p-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs space-y-1';
+          resBox.innerHTML = `<div class="font-bold">Include "${item.word}" in your sentence!</div><p>Make sure to use the word (or a natural form of it) so your brain links it to your personal context.</p>`;
+          resBox.classList.remove('hidden');
+          return;
+        }
+
+        if (wordCount < 5) {
+          playTone('error');
+          resBox.className = 'p-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs space-y-1';
+          resBox.innerHTML = `<div class="font-bold">Add a bit more real-life context!</div><p>Try writing at least 5–7 words showing <em>when</em> or <em>why</em> "${item.word}" happens.</p>`;
+          resBox.classList.remove('hidden');
+          return;
+        }
+
+        playTone('success');
+        const bonus = usedColloc ? 30 : 20;
+        awardXp(bonus, 15);
+        item.mastery = Math.min(100, (item.mastery || 30) + 20);
+        saveState();
+
+        resBox.className = 'p-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-xs space-y-2';
+        resBox.innerHTML = `
+          <div class="font-bold text-sm">🌟 Excellent real-life production! +${bonus} XP</div>
+          <p>${usedColloc ? `Bonus! You used the native collocation <strong>"${usedColloc}"</strong>.` : `Great contextual sentence length (${wordCount} words).`}</p>
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-300">
+            <strong>Native Reference Comparison:</strong> "${item.examples && item.examples[0] ? item.examples[0].text : ''}"
+          </div>
+          <button id="nextSentenceWordBtn" class="mt-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">
+            Practice Next Word →
+          </button>
+        `;
+        resBox.classList.remove('hidden');
+        document.getElementById('nextSentenceWordBtn').addEventListener('click', () => {
+          state.sentenceIndex += 1;
+          renderSentenceBuilder();
+        });
+      });
+    }
+
+    function renderNuanceSpotter() {
+      const container = document.getElementById('practice-nuance');
+      const pool = state.words.filter(w => w.nuanceQuiz);
+      if (pool.length === 0) return;
+      const item = pool[state.nuanceIndex % pool.length];
+      const swapOrder = (state.nuanceIndex % 2) === 1;
+
+      const choices = swapOrder
+        ? [
+            { text: item.nuanceQuiz.unnatural, isNatural: false },
+            { text: item.nuanceQuiz.natural, isNatural: true }
+          ]
+        : [
+            { text: item.nuanceQuiz.natural, isNatural: true },
+            { text: item.nuanceQuiz.unnatural, isNatural: false }
+          ];
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300">
+            Register & Naturalness Check • ${item.word}
+          </span>
+          <span class="text-xs text-slate-400">Situation ${(state.nuanceIndex % pool.length) + 1} of ${pool.length}</span>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Real-Life Situation:</div>
+          <div class="text-base font-bold text-white mt-1">${item.nuanceQuiz.situation}</div>
+        </div>
+
+        <div class="text-xs font-semibold text-slate-300">Which sentence sounds natural to a native English speaker?</div>
+
+        <div class="space-y-3">
+          ${choices.map((c, idx) => `
+            <button data-natural="${c.isNatural}" class="nuance-choice-btn w-full p-4 rounded-2xl bg-slate-900 hover:bg-indigo-950/70 border border-slate-700 hover:border-indigo-500 text-left text-sm text-slate-100 transition flex items-center justify-between gap-3">
+              <span><strong>Option ${idx + 1}:</strong> "${c.text}"</span>
+              <span class="text-xs text-indigo-400 shrink-0">Choose →</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <div id="nuanceFeedback" class="hidden p-4 rounded-2xl border text-xs space-y-2"></div>
+      `;
+
+      container.querySelectorAll('.nuance-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isNat = btn.getAttribute('data-natural') === 'true';
+          const fb = document.getElementById('nuanceFeedback');
+          if (isNat) {
+            playTone('success');
+            awardXp(20, 10);
+            fb.className = 'p-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-xs space-y-2';
+            fb.innerHTML = `
+              <div class="font-bold text-sm">✓ Natural choice! +20 XP</div>
+              <p>${item.nuanceQuiz.why}</p>
+              <button id="nextNuanceBtn" class="mt-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">
+                Next Scenario →
+              </button>
+            `;
+            fb.classList.remove('hidden');
+            document.getElementById('nextNuanceBtn').addEventListener('click', () => {
+              state.nuanceIndex += 1;
+              renderNuanceSpotter();
+            });
+          } else {
+            playTone('error');
+            fb.className = 'p-4 rounded-2xl border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs space-y-1';
+            fb.innerHTML = `
+              <div class="font-bold">That phrasing sounds awkward to native speakers.</div>
+              <p>${item.nuanceQuiz.why}</p>
+            `;
+            fb.classList.remove('hidden');
+          }
+        });
+      });
+    }
+
+    let arcadeInterval = null;
+    let arcadeTimeLeft = 60;
+    let arcadeScore = 0;
+    let arcadeCombo = 1;
+    let arcadePlaying = false;
+
+    function stopArcadeTimer() {
+      if (arcadeInterval) {
+        clearInterval(arcadeInterval);
+        arcadeInterval = null;
+      }
+      arcadePlaying = false;
+    }
+
+    function renderArcadeIntro() {
+      stopArcadeTimer();
+      const stage = document.getElementById('arcadeStage');
+      if (!stage) return;
+      document.getElementById('arcadeTimer').textContent = '60s';
+      document.getElementById('arcadeCombo').textContent = 'x1';
+      document.getElementById('arcadeScore').textContent = arcadeScore;
+
+      stage.innerHTML = `
+        <div class="max-w-md space-y-4">
+          <div class="w-16 h-16 rounded-3xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-3xl mx-auto">
+            ⚡
+          </div>
+          <h3 class="font-display font-bold text-xl">Ready for a 60-Second Context Blitz?</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            You'll see real-life meanings and collocations. Pick the matching English word as fast as you can to build your combo multiplier and boost your adaptive score!
+          </p>
+          <button id="startArcadeBtn" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-bold text-sm shadow-lg shadow-rose-500/25 transition">
+            ▶ Start Word Rush
+          </button>
+        </div>
+      `;
+
+      document.getElementById('startArcadeBtn').addEventListener('click', startArcadeGame);
+    }
+
+    function startArcadeGame() {
+      stopArcadeTimer();
+      playTone('click');
+      arcadeTimeLeft = 60;
+      arcadeScore = 0;
+      arcadeCombo = 1;
+      arcadePlaying = true;
+
+      document.getElementById('arcadeTimer').textContent = arcadeTimeLeft + 's';
+      document.getElementById('arcadeCombo').textContent = 'x' + arcadeCombo;
+      document.getElementById('arcadeScore').textContent = arcadeScore;
+
+      arcadeInterval = setInterval(() => {
+        arcadeTimeLeft -= 1;
+        const timerEl = document.getElementById('arcadeTimer');
+        if (timerEl) timerEl.textContent = arcadeTimeLeft + 's';
+        if (arcadeTimeLeft <= 0) {
+          endArcadeGame();
+        }
+      }, 1000);
+
+      nextArcadeRound();
+    }
+
+    function nextArcadeRound() {
+      if (!arcadePlaying) return;
+      const stage = document.getElementById('arcadeStage');
+      const target = state.words[Math.floor(Math.random() * state.words.length)];
+      const distractors = state.words
+        .filter(w => w.id !== target.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      const choices = [target, ...distractors].sort(() => Math.random() - 0.5);
+
+      stage.innerHTML = `
+        <div class="w-full max-w-xl space-y-5 text-left">
+          <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>CEFR ${target.level} Clue</span>
+              <span>Collocation: <strong class="text-indigo-300">${(target.collocations && target.collocations[0]) || target.word}</strong></span>
+            </div>
+            <div class="text-base sm:text-lg font-bold text-white">${target.meaning}</div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            ${choices.map(c => `
+              <button data-ans="${c.id === target.id}" class="arcade-ans-btn p-4 rounded-2xl bg-slate-900 hover:bg-indigo-950 border border-slate-700 hover:border-indigo-500 font-display font-bold text-base text-white transition text-center">
+                ${c.word}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      stage.querySelectorAll('.arcade-ans-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!arcadePlaying) return;
+          const correct = btn.getAttribute('data-ans') === 'true';
+          if (correct) {
+            playTone('success');
+            arcadeScore += 10 * arcadeCombo;
+            arcadeCombo = Math.min(5, arcadeCombo + 1);
+            target.mastery = Math.min(100, (target.mastery || 30) + 8);
+          } else {
+            playTone('error');
+            arcadeCombo = 1;
+          }
+          document.getElementById('arcadeCombo').textContent = 'x' + arcadeCombo;
+          document.getElementById('arcadeScore').textContent = arcadeScore;
+          nextArcadeRound();
+        });
+      });
+    }
+
+    function endArcadeGame() {
+      stopArcadeTimer();
+      playTone('levelup');
+      const earnedXp = Math.max(15, Math.round(arcadeScore / 2));
+      awardXp(earnedXp, 15);
+      const stage = document.getElementById('arcadeStage');
+      if (!stage) return;
+      stage.innerHTML = `
+        <div class="max-w-md space-y-4">
+          <div class="text-4xl">🏆</div>
+          <h3 class="font-display font-extrabold text-2xl">Blitz Complete! Score: ${arcadeScore}</h3>
+          <p class="text-sm text-emerald-300 font-semibold">+${earnedXp} XP added to your profile & synced!</p>
+          <button id="replayArcadeBtn" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition">
+            🔄 Play Again
+          </button>
+        </div>
+      `;
+      document.getElementById('replayArcadeBtn').addEventListener('click', startArcadeGame);
+    }
+
+    const EXTERNAL_FALLBACK_PACKS = {
+      technology: [
+        {
+          word: 'scalable',
+          phonetic: '/ˈskeɪləbl/',
+          pos: 'adjective',
+          level: 'B2',
+          topic: 'work',
+          source: 'Live Tech & Startup Stream',
+          meaning: 'Able to grow or handle increased demand smoothly without breaking.',
+          nuance: 'Used constantly in software, business models, and personal workflows.',
+          collocations: ['scalable architecture', 'highly scalable', 'scalable solution'],
+          mnemonic: 'SCALE + ABLE: Able to climb up the scale as users grow!',
+          examples: [{ context: 'Product Review', text: 'We need a scalable workflow that works for both 10 and 10,000 users.' }]
+        },
+        {
+          word: 'seamless',
+          phonetic: '/ˈsiːmləs/',
+          pos: 'adjective',
+          level: 'B2',
+          topic: 'work',
+          source: 'Live UX & Product Corpus',
+          meaning: 'Smooth and continuous, with no awkward transitions or interruptions.',
+          nuance: 'A favorite word for describing great user experiences, cross-device sync, or travel connections.',
+          collocations: ['seamless integration', 'seamless sync', 'seamless experience'],
+          mnemonic: 'SEAM-less: Like a shirt with no itchy seams—completely smooth!',
+          examples: [{ context: 'App Design', text: 'Cloud sync makes switching between my MacBook and Android phone seamless.' }]
+        }
+      ],
+      conversation: [
+        {
+          word: 'articulate',
+          phonetic: '/ɑːˈtɪkjuleɪt/',
+          pos: 'adjective / verb',
+          level: 'C1',
+          topic: 'social',
+          source: 'Spoken Fluency Corpus',
+          meaning: 'Able to express thoughts and feelings clearly, effectively, and naturally.',
+          nuance: 'As a verb, it means to put a complex feeling or idea into clear words.',
+          collocations: ['articulate your thoughts', 'highly articulate speaker', 'hard to articulate'],
+          mnemonic: 'ART-iculate: Turning your messy thoughts into clear ART with words.',
+          examples: [{ context: 'Everyday Chat', text: 'It was hard to articulate why that movie moved me so deeply.' }]
+        }
+      ],
+      travel: [
+        {
+          word: 'itinerary',
+          phonetic: '/aɪˈtɪnərəri/',
+          pos: 'noun',
+          level: 'B1',
+          topic: 'travel',
+          source: 'Global Travel Lexicon',
+          meaning: 'A planned route or day-by-day schedule for a journey.',
+          nuance: 'Used for both flight bookings and casual weekend sightseeing plans.',
+          collocations: ['flexible itinerary', 'travel itinerary', 'on the itinerary'],
+          mnemonic: 'IT-IN-ERARY: What IT is IN your travel diary!',
+          examples: [{ context: 'Trip Planning', text: 'Let us keep our Saturday itinerary flexible so we can explore local cafes.' }]
+        }
+      ],
+      persuasion: [
+        {
+          word: 'compelling',
+          phonetic: '/kəmˈpelɪŋ/',
+          pos: 'adjective',
+          level: 'C1',
+          topic: 'work',
+          source: 'Leadership & Rhetoric Corpus',
+          meaning: 'Evoking strong interest, attention, or admiration in a powerfully convincing way.',
+          nuance: 'Much stronger than "interesting"—use it for great stories, arguments, or job candidates.',
+          collocations: ['a compelling argument', 'compelling reason', 'compelling story'],
+          mnemonic: 'COM-PELLING: It PROPELS people to agree with you!',
+          examples: [{ context: 'Strategy Meeting', text: 'She made a compelling case for launching on mobile first.' }]
+        }
+      ],
+      science: [
+        {
+          word: 'cognitive',
+          phonetic: '/ˈkɒɡnətɪv/',
+          pos: 'adjective',
+          level: 'C1',
+          topic: 'mind',
+          source: 'Behavioral Science Stream',
+          meaning: 'Connected with mental processes of understanding, memory, and learning.',
+          nuance: 'Frequently used in everyday discussions about focus ("cognitive load").',
+          collocations: ['cognitive load', 'cognitive bias', 'cognitive skills'],
+          mnemonic: 'COG-nitive: The mental COGS spinning inside your brain!',
+          examples: [{ context: 'Learning Science', text: 'Spaced repetition reduces cognitive overload when mastering new vocabulary.' }]
+        }
+      ]
+    };
+
+    async function fetchWordsFromExternalSource(topicKey) {
+      const resultsBox = document.getElementById('externalFetchResults');
+      if (resultsBox) {
+        resultsBox.innerHTML = `<div class="col-span-full p-4 rounded-2xl bg-slate-900 border border-indigo-500/30 text-xs text-indigo-300 animate-pulse">🌐 Connecting to external linguistic APIs (Datamuse + Free Dictionary API) for "${topicKey}"...</div>`;
+      }
+
+      const addedWords = [];
+
+      try {
+        const dmRes = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(topicKey)}&max=6`);
+        if (dmRes.ok) {
+          const dmWords = await dmRes.json();
+          for (const entry of dmWords.slice(0, 2)) {
+            const candidate = entry.word;
+            if (!candidate || candidate.includes(' ') || state.words.some(w => w.word.toLowerCase() === candidate.toLowerCase())) continue;
+
+            const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(candidate)}`);
+            if (dictRes.ok) {
+              const dictData = await dictRes.json();
+              const first = dictData[0];
+              const meaningObj = first && first.meanings && first.meanings[0];
+              const defObj = meaningObj && meaningObj.definitions && meaningObj.definitions[0];
+              if (defObj && defObj.definition) {
+                let viTranslated = '';
+                try {
+                  const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(first.word + ': ' + defObj.definition)}&langpair=en|vi`);
+                  if (trRes.ok) {
+                    const trJson = await trRes.json();
+                    if (trJson && trJson.responseData && trJson.responseData.translatedText) {
+                      viTranslated = trJson.responseData.translatedText;
+                    }
+                  }
+                } catch (trErr) {}
+                const newWordObj = buildWordObjectFromExternal({
+                  viMeaning: viTranslated || undefined,
+                  word: first.word,
+                  phonetic: first.phonetic || (first.phonetics && first.phonetics[0] && first.phonetics[0].text) || `/${first.word}/`,
+                  pos: (meaningObj && meaningObj.partOfSpeech) || 'vocabulary',
+                  level: state.level,
+                  topic: 'work',
+                  source: 'Free Dictionary API + Datamuse Live',
+                  meaning: defObj.definition,
+                  exampleText: defObj.example || `In real-life discussions about ${topicKey}, "${first.word}" is a natural choice.`
+                });
+                state.words.unshift(newWordObj);
+                addedWords.push(newWordObj);
+              }
+            }
+          }
+        }
+      } catch (networkErr) {}
+
+      const fallbackPool = EXTERNAL_FALLBACK_PACKS[topicKey] || [
+        ...EXTERNAL_FALLBACK_PACKS.technology,
+        ...EXTERNAL_FALLBACK_PACKS.conversation,
+        ...EXTERNAL_FALLBACK_PACKS.travel,
+        ...EXTERNAL_FALLBACK_PACKS.persuasion,
+        ...EXTERNAL_FALLBACK_PACKS.science
+      ];
+
+      for (const fb of fallbackPool) {
+        if (!state.words.some(w => w.word.toLowerCase() === fb.word.toLowerCase())) {
+          const enriched = buildWordObjectFromExternal({
+            ...fb,
+            level: fb.level || state.level,
+            exampleText: fb.examples && fb.examples[0] ? fb.examples[0].text : ''
+          });
+          state.words.unshift(enriched);
+          addedWords.push(enriched);
+          if (addedWords.length >= 2) break;
+        }
+      }
+
+      if (addedWords.length === 0 && topicKey) {
+        const cleanTerm = topicKey.trim().toLowerCase();
+        if (cleanTerm && !state.words.some(w => w.word.toLowerCase() === cleanTerm)) {
+          const customWord = buildWordObjectFromExternal({
+            word: cleanTerm,
+            phonetic: `/${cleanTerm}/`,
+            pos: 'contextual term',
+            level: state.level,
+            topic: 'social',
+            source: 'External Topic Extractor',
+            meaning: `Key concept and real-world vocabulary expression related to "${cleanTerm}".`,
+            exampleText: `We used "${cleanTerm}" naturally during our real-world conversation today.`
+          });
+          state.words.unshift(customWord);
+          addedWords.push(customWord);
+        }
+      }
+
+      saveState();
+      renderDashboard();
+      playTone('success');
+
+      if (resultsBox) {
+        if (addedWords.length > 0) {
+          resultsBox.innerHTML = addedWords.map(w => `
+            <div class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/40 flex flex-col justify-between gap-2">
+              <div class="flex items-center justify-between">
+                <span class="font-display font-bold text-base text-white">${w.word} <span class="text-xs text-slate-400 font-mono">${w.phonetic}</span></span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Added to ${w.level} Deck</span>
+              </div>
+              <p class="text-xs text-slate-200">${w.meaning}</p>
+              <div class="text-[11px] text-slate-400">Source: ${w.source}</div>
+            </div>
+          `).join('');
+          showToast(`🌐 Auto-imported ${addedWords.length} new word(s) into your adaptive deck!`, 'emerald');
+        } else {
+          resultsBox.innerHTML = `<div class="col-span-full p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300">All words from this topic pack are already in your active deck! Try entering any custom theme above.</div>`;
+          showToast('Pack already in your deck! Try another topic.', 'indigo');
+        }
+      }
+    }
+
+    function buildWordObjectFromExternal(raw) {
+      const w = raw.word;
+      return {
+        id: 'ext_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        word: w,
+        phonetic: raw.phonetic || `/${w}/`,
+        pos: raw.pos || 'vocabulary',
+        level: raw.level || state.level,
+        topic: raw.topic || 'work',
+        source: raw.source || 'External Dictionary API',
+        meaning: raw.meaning,
+        viMeaning: raw.viMeaning || (VI_DICTIONARY[w.toLowerCase()] && VI_DICTIONARY[w.toLowerCase()].viMeaning) || ('Nghĩa tiếng Việt: ' + raw.meaning),
+        viExplain: raw.viExplain || (VI_DICTIONARY[w.toLowerCase()] && VI_DICTIONARY[w.toLowerCase()].viExplain) || ('Từ vựng thực tế chủ đề ' + (raw.topic || 'giao tiếp') + ', giúp diễn đạt tự nhiên hơn trong tiếng Anh.'),
+        nuance: raw.nuance || `Frequently used in ${raw.level || state.level} real-world English conversations.`,
+        collocations: raw.collocations || [`use ${w}`, `in ${w} context`, `highly ${w}`],
+        mnemonic: raw.mnemonic || `Visualize using "${w}" in a conversation today.`,
+        examples: raw.examples || [
+          { context: 'Real-World Context', text: raw.exampleText || `That is a great example of ${w} in action.` }
+        ],
+        cloze: {
+          speakerA: `How would you describe that aspect of the project?`,
+          speakerB: `I would definitely call it ____ based on what we saw today.`,
+          options: [w, 'obsolete', 'trivial', 'arbitrary'],
+          answer: w
+        },
+        nuanceQuiz: {
+          situation: `Using "${w}" naturally in a real-world discussion.`,
+          natural: raw.exampleText || `Let us focus on how ${w} applies to our daily workflow.`,
+          unnatural: `Let us focus on how ${w} eats our daily dictionary.`,
+          why: `"${w}" means: ${raw.meaning}`
+        },
+        interval: 0,
+        repetition: 0,
+        efactor: 2.5,
+        mastery: 20,
+        dueAt: Date.now()
+      };
+    }
+
+    function updateSyncTokenField() {
+      const out = document.getElementById('syncTokenOutput');
+      if (!out) return;
+      try {
+        const compactPayload = {
+          l: state.level,
+          e: state.elo,
+          x: state.xp,
+          s: state.streak,
+          w: state.words.map(item => ({
+            i: item.id,
+            w: item.word,
+            m: item.mastery,
+            iv: item.interval,
+            r: item.repetition
+          }))
+        };
+        const token = btoa(unescape(encodeURIComponent(JSON.stringify(compactPayload))));
+        out.value = 'LXF1:' + token;
+      } catch (err) {
+        out.value = 'LXF1:SYNC_READY';
+      }
+    }
+
+    function copyTextFallback(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (e) {}
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } catch (e) {}
+      ta.remove();
+      return true;
+    }
+
+    function applySyncToken(rawToken) {
+      const clean = (rawToken || '').trim().replace(/^LXF1:/, '');
+      if (!clean) {
+        showToast('Please paste a valid Sync Code first.', 'amber');
+        return;
+      }
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(clean))));
+        if (decoded.l) state.level = decoded.l;
+        if (decoded.e) state.elo = decoded.e;
+        if (typeof decoded.x === 'number') state.xp = decoded.x;
+        if (typeof decoded.s === 'number') state.streak = decoded.s;
+        if (Array.isArray(decoded.w)) {
+          decoded.w.forEach(syncedWord => {
+            const match = state.words.find(localW => localW.id === syncedWord.i || localW.word === syncedWord.w);
+            if (match) {
+              match.mastery = syncedWord.m;
+              match.interval = syncedWord.iv;
+              match.repetition = syncedWord.r;
+            }
+          });
+        }
+        saveState();
+        renderDashboard();
+        playTone('levelup');
+        showToast('✓ Device progress synced! Level ' + state.level + ' (' + state.xp + ' XP) restored.', 'emerald');
+      } catch (err) {
+        playTone('error');
+        showToast('Invalid Sync Code format. Copy the full LXF1:... code.', 'rose');
+      }
+    }
+
+    async function pushToCloudGist() {
+      const token = (document.getElementById('cloudTokenInput').value || '').trim();
+      const gistIdInput = document.getElementById('cloudGistIdInput');
+      const statusMsg = document.getElementById('cloudSyncStatusMsg');
+      if (!token) {
+        showToast('Enter a GitHub Gist token (or use the Instant Sync Code on the left).', 'amber');
+        return;
+      }
+      statusMsg.textContent = '☁️ Pushing vocabulary progress to Cloud Gist...';
+      try {
+        const gistId = (gistIdInput.value || state.cloudGistId || '').trim();
+        const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
+        const method = gistId ? 'PATCH' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            description: 'LexiFlow Vocabulary App Cross-Device Sync State',
+            public: false,
+            files: {
+              'lexiflow_sync.json': {
+                content: JSON.stringify(state, null, 2)
+              }
+            }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          state.cloudGistId = data.id;
+          gistIdInput.value = data.id;
+          saveState();
+          statusMsg.textContent = '✓ Synced to Cloud Gist ID: ' + data.id;
+          showToast('☁️ Progress pushed to Cloud! Use Gist ID on your other devices.', 'emerald');
+        } else {
+          statusMsg.textContent = 'Could not reach GitHub Gist API (check token permissions).';
+        }
+      } catch (e) {
+        statusMsg.textContent = 'Offline mode: Use the Instant Sync Code on the left to transfer offline.';
+      }
+    }
+
+    async function pullFromCloudGist() {
+      const token = (document.getElementById('cloudTokenInput').value || '').trim();
+      const gistId = (document.getElementById('cloudGistIdInput').value || state.cloudGistId || '').trim();
+      const statusMsg = document.getElementById('cloudSyncStatusMsg');
+      if (!gistId) {
+        showToast('Enter your Gist ID to pull cloud progress.', 'amber');
+        return;
+      }
+      statusMsg.textContent = '☁️ Pulling latest progress from Cloud Gist...';
+      try {
+        const headers = { 'Accept': 'application/vnd.github+json' };
+        if (token) headers['Authorization'] = `token ${token}`;
+        const res = await fetch(`https://api.github.com/gists/${gistId}`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const fileObj = data.files && data.files['lexiflow_sync.json'];
+          if (fileObj && fileObj.content) {
+            const remoteState = JSON.parse(fileObj.content);
+            state = { ...state, ...remoteState };
+            saveState();
+            renderDashboard();
+            statusMsg.textContent = '✓ Pulled latest state from Cloud (' + state.lastSyncedAt + ')';
+            showToast('☁️ Cloud progress synced to this device!', 'emerald');
+          }
+        } else {
+          statusMsg.textContent = 'Gist ID not found or private token required.';
+        }
+      } catch (e) {
+        statusMsg.textContent = 'Could not connect to Cloud Gist. Use the Instant Sync Code on the left.';
+      }
+    }
+
+    let placementIdx = 0;
+    let placementScore = 1200;
+
+    function openPlacementModal() {
+      placementIdx = 0;
+      placementScore = 1200;
+      const modal = document.getElementById('placementModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      renderPlacementStep();
+    }
+
+    function closePlacementModal() {
+      const modal = document.getElementById('placementModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderPlacementStep() {
+      const content = document.getElementById('placementContent');
+      if (placementIdx >= PLACEMENT_QUESTIONS.length) {
+        let calibrated = 'B1';
+        if (placementScore >= 1720) calibrated = 'C2';
+        else if (placementScore >= 1580) calibrated = 'C1';
+        else if (placementScore >= 1400) calibrated = 'B2';
+        else if (placementScore >= 1250) calibrated = 'B1';
+        else calibrated = 'A2';
+
+        state.level = calibrated;
+        state.elo = placementScore;
+        saveState();
+        renderDashboard();
+        playTone('levelup');
+
+        content.innerHTML = `
+          <div class="text-center space-y-4 py-4">
+            <div class="w-16 h-16 rounded-3xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto">
+              🎯
+            </div>
+            <h3 class="font-display font-extrabold text-2xl">Calibrated Level: CEFR ${calibrated}</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ${LEVEL_META[calibrated].title} (Adaptive Score: ${placementScore}). Your vocabulary stream and spaced repetition deck have been automatically updated to match your level!
+            </p>
+            <button id="finishPlacementBtn" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition">
+              Explore My ${calibrated} Word Stream →
+            </button>
+          </div>
+        `;
+        document.getElementById('finishPlacementBtn').addEventListener('click', closePlacementModal);
+        return;
+      }
+
+      const q = PLACEMENT_QUESTIONS[placementIdx];
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span>Question ${placementIdx + 1} of ${PLACEMENT_QUESTIONS.length}</span>
+            <span class="text-indigo-400 font-semibold">Testing CEFR ${q.level}</span>
+          </div>
+          <h3 class="font-display font-bold text-lg text-white leading-snug">${q.question}</h3>
+          <div class="grid grid-cols-1 gap-2.5 pt-2">
+            ${q.options.map(opt => `
+              <button data-popt="${opt}" class="placement-opt-btn p-3.5 rounded-2xl bg-slate-900 hover:bg-indigo-950/80 border border-slate-700 hover:border-indigo-500 text-left text-sm font-semibold text-white transition">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      content.querySelectorAll('.placement-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const picked = btn.getAttribute('data-popt');
+          if (picked === q.answer) {
+            playTone('success');
+            placementScore = Math.max(placementScore, q.scoreValue + 40);
+          } else {
+            playTone('error');
+            placementScore = Math.max(1050, placementScore - 40);
+          }
+          placementIdx += 1;
+          renderPlacementStep();
+        });
+      });
+    }
+
+    function switchTab(tabId) {
+      if (tabId !== 'arcade') stopArcadeTimer();
+      state.activeTab = tabId;
+
+      document.querySelectorAll('.tab-view').forEach(sec => {
+        sec.classList.toggle('hidden', sec.id !== 'view-' + tabId);
+      });
+
+      document.querySelectorAll('#desktopNav .nav-btn').forEach(btn => {
+        const active = btn.getAttribute('data-tab') === tabId;
+        btn.className = active
+          ? 'nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
+          : 'nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-semibold text-slate-300 hover:bg-slate-800/70 transition-all';
+      });
+
+      document.querySelectorAll('#mobileNav .nav-btn').forEach(btn => {
+        const active = btn.getAttribute('data-tab') === tabId;
+        btn.className = active
+          ? 'nav-btn relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-indigo-400 font-semibold text-[11px]'
+          : 'nav-btn relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-slate-400 font-medium text-[11px]';
+      });
+
+      const titleMap = {
+        dashboard: ['Adaptive Learning Hub', 'Curated words matched to your level from live external dictionaries & corpora'],
+        study: ['Smart Spaced Repetition (SM-2)', 'Master pronunciation, real-life collocations, and memory hooks'],
+        practice: ['Real-Life Context Lab', 'Practice active recall in realistic conversations, sentences, and social registers'],
+        arcade: ['Word Rush Arcade Blitz', 'Fast-paced 60-second recall challenge with combo multipliers'],
+        discover: ['External Vocabulary Sources', 'Auto-import real words by topic from Datamuse & Free Dictionary APIs'],
+        sync: ['Cross-Platform Sync Center', 'Keep your progress in sync across Windows PC, MacBook, and Android']
+      };
+      if (titleMap[tabId]) {
+        document.getElementById('pageHeaderTitle').textContent = titleMap[tabId][0];
+        document.getElementById('pageHeaderSubtitle').textContent = titleMap[tabId][1];
+      }
+
+      if (tabId === 'dashboard') renderDashboard();
+      else if (tabId === 'study') renderSrsCard();
+      else if (tabId === 'practice') renderPracticeLab();
+      else if (tabId === 'arcade') renderArcadeIntro();
+      else if (tabId === 'sync') updateSyncTokenField();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderDashboard();
+      updateSyncTokenField();
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playTone('click');
+          switchTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      document.getElementById('startDailySessionBtn').addEventListener('click', () => switchTab('study'));
+      document.getElementById('heroPracticeBtn').addEventListener('click', () => switchTab('practice'));
+      document.getElementById('openPlacementBtnHero').addEventListener('click', openPlacementModal);
+      document.getElementById('openPlacementBtnSidebar').addEventListener('click', openPlacementModal);
+      document.getElementById('closePlacementBtn').addEventListener('click', closePlacementModal);
+
+      document.getElementById('quickFetchHeaderBtn').addEventListener('click', () => {
+        switchTab('discover');
+        fetchWordsFromExternalSource('technology');
+      });
+
+      document.querySelectorAll('.level-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const newLvl = btn.getAttribute('data-level');
+          state.level = newLvl;
+          state.elo = LEVEL_META[newLvl].minElo + 50;
+          saveState();
+          renderDashboard();
+          showToast('Switched adaptive target to CEFR ' + newLvl + ' (' + LEVEL_META[newLvl].title + ')', 'indigo');
+        });
+      });
+
+      document.getElementById('topicFilterSelect').addEventListener('change', (e) => {
+        state.topicFilter = e.target.value;
+        renderDashboard();
+      });
+
+      document.getElementById('srsShuffleBtn').addEventListener('click', () => {
+        state.words.sort(() => Math.random() - 0.5);
+        state.srsIndex = 0;
+        state.srsFlipped = false;
+        renderSrsCard();
+        showToast('🔀 Shuffled your review deck!', 'indigo');
+      });
+
+      document.getElementById('srsLoadMoreBtn').addEventListener('click', () => {
+        fetchWordsFromExternalSource('conversation');
+        renderSrsCard();
+      });
+
+      document.querySelectorAll('.pmode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.practiceMode = btn.getAttribute('data-pmode');
+          renderPracticeLab();
+        });
+      });
+
+      document.querySelectorAll('.stream-pack-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const stream = btn.getAttribute('data-stream');
+          fetchWordsFromExternalSource(stream);
+        });
+      });
+
+      document.getElementById('fetchExternalCustomBtn').addEventListener('click', () => {
+        const val = (document.getElementById('externalTopicInput').value || '').trim() || 'innovation';
+        fetchWordsFromExternalSource(val);
+      });
+
+      document.getElementById('generateSyncCodeBtn').addEventListener('click', () => {
+        updateSyncTokenField();
+        const code = document.getElementById('syncTokenOutput').value;
+        copyTextFallback(code);
+        playTone('success');
+        showToast('📋 Sync Code copied to clipboard! Paste it on your PC, MacBook, or Android phone.', 'emerald');
+      });
+
+      document.getElementById('downloadBackupJsonBtn').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'lexiflow_vocab_sync_backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('⬇️ Downloaded JSON backup file.', 'indigo');
+      });
+
+      document.getElementById('applySyncCodeBtn').addEventListener('click', () => {
+        const input = document.getElementById('syncTokenInput').value;
+        applySyncToken(input);
+      });
+
+      document.getElementById('cloudPushBtn').addEventListener('click', pushToCloudGist);
+      document.getElementById('cloudPullBtn').addEventListener('click', pullFromCloudGist);
+
+      const updateViBtnUi = () => {
+        const lbl = document.getElementById('viModeLabel');
+        const btn = document.getElementById('viModeToggleBtn');
+        if (!lbl || !btn) return;
+        lbl.textContent = state.viEnabled ? 'Giải nghĩa TV: BẬT' : 'Giải nghĩa TV: TẮT';
+        btn.className = state.viEnabled
+          ? 'px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition flex items-center gap-1.5'
+          : 'px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 text-xs font-semibold transition flex items-center gap-1.5';
+      };
+      updateViBtnUi();
+
+      document.getElementById('viModeToggleBtn').addEventListener('click', () => {
+        state.viEnabled = !state.viEnabled;
+        updateViBtnUi();
+        saveState();
+        switchTab(state.activeTab);
+        showToast(state.viEnabled ? '🇻🇳 Đã bật giải nghĩa & ví dụ song ngữ Tiếng Việt!' : 'Đã chuyển sang chế độ 100% Tiếng Anh.', 'emerald');
+      });
+
+      document.getElementById('soundToggleBtn').addEventListener('click', () => {
+        state.soundEnabled = !state.soundEnabled;
+        document.getElementById('soundIcon').textContent = state.soundEnabled ? '🔊' : '🔇';
+        document.getElementById('soundLabel').textContent = state.soundEnabled ? 'SFX On' : 'Muted';
+        saveState();
+      });
+
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        state.darkMode = !state.darkMode;
+        document.documentElement.classList.toggle('dark', state.darkMode);
+        document.body.className = state.darkMode
+          ? 'bg-slate-950 text-slate-100 transition-colors duration-200 min-h-screen flex flex-col'
+          : 'bg-slate-50 text-slate-900 transition-colors duration-200 min-h-screen flex flex-col';
+        document.getElementById('themeIcon').textContent = state.darkMode ? '🌙' : '☀️';
+        document.getElementById('themeLabel').textContent = state.darkMode ? 'Dark Theme' : 'Light Theme';
+        saveState();
+      });
+    });
+  </script>
+</body>
+</html>
